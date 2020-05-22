@@ -25,8 +25,12 @@ class PeiPart {
 
 class PeiChart extends StatefulWidget {
   final List<double> data;
+  final List<String> legends;
 
-  const PeiChart({@required this.data});
+  const PeiChart({
+    @required this.data,
+    this.legends,
+  });
 
   @override
   _PeiChartState createState() => _PeiChartState();
@@ -93,7 +97,9 @@ class _PeiChartState extends State<PeiChart> with TickerProviderStateMixin {
           height: 300,
           child: CustomPaint(
             painter: PeiChartPainter(
-              datas: _animateParts,
+              datas: widget.data,
+              legends: widget.legends,
+              parts: _animateParts,
             ),
           ),
         ),
@@ -118,12 +124,19 @@ class _PeiChartState extends State<PeiChart> with TickerProviderStateMixin {
 }
 
 class PeiChartPainter extends CustomPainter {
-  final List<PeiPart> datas;
-  PeiChartPainter({@required this.datas});
+  final List<double> datas;
+  final List<PeiPart> parts;
+  final List<String> legends;
+
+  PeiChartPainter({
+    @required this.datas,
+    @required this.legends,
+    @required this.parts,
+  });
 
   double radius = 120.0;
 
-  void drawPart(Canvas canvas, Size size) {
+  void drawParts(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
     Offset center = Offset(sw / 2, sh / 2);
@@ -136,17 +149,85 @@ class PeiChartPainter extends CustomPainter {
       ..style = PaintingStyle.fill
       ..strokeWidth = 0.0;
 
-    for (int i = 0; i < datas.length; i++) {
-      final part = datas[i];
+    for (int i = 0; i < parts.length; i++) {
+      final part = parts[i];
       paint.color = part.color;
 
       canvas.drawArc(rect, part.startAngle, part.sweepAngle, true, paint);
     }
   }
 
+  void drawCircle(Canvas canvas, Size size) {
+    final sw = size.width;
+    final sh = size.height;
+    Offset center = Offset(sw / 2, sh / 2);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = Colors.grey[300]
+      ..strokeWidth = 1.0;
+
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  void drawLegends(Canvas canvas, Size size) {
+    final sw = size.width;
+    final sh = size.height;
+
+    for (int i = 0; i < datas.length; i++) {
+      final data = datas[i];
+      final part = parts[i];
+      final legend = legends[i];
+      final radians = part.startAngle + part.sweepAngle / 2;
+
+      double x = math.cos(radians) * radius / 2 + sw / 2 - 12;
+      double y = math.sin(radians) * radius / 2 + sh / 2;
+      final offset = Offset(x, y);
+
+      TextPainter(
+        textAlign: TextAlign.start,
+        text: TextSpan(
+          text: '$data',
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )
+        ..layout(
+          minWidth: 0,
+          maxWidth: size.width,
+        )
+        ..paint(canvas, offset);
+
+      double lx = math.cos(radians) * (radius + 32) + sw / 2 - 12;
+      double ly = math.sin(radians) * (radius + 32) + sh / 2 - 4;
+      final lOffset = Offset(lx, ly);
+      TextPainter(
+        textAlign: TextAlign.center,
+        text: TextSpan(
+          text: '$legend',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )
+        ..layout(
+          minWidth: 0,
+          maxWidth: size.width,
+        )
+        ..paint(canvas, lOffset);
+    }
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    drawPart(canvas, size);
+    drawCircle(canvas, size);
+    drawParts(canvas, size);
+    drawLegends(canvas, size);
   }
 
   @override

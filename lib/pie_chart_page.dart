@@ -12,13 +12,10 @@ class _PieChartPageState extends State<PieChartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: PeiChart(data: [
-          60.0,
-          50.0,
-          40.0,
-          30.0,
-          90.0,
-        ]),
+        child: PeiChart(
+          data: [60.0, 50.0, 40.0, 30.0, 90.0],
+          legends: ['一月', '二月', '三月', '四月', '五月'],
+        ),
       ),
     );
   }
