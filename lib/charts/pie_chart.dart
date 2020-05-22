@@ -3,12 +3,12 @@ import 'dart:math' as math;
 import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
 
-class PeiPart {
+class PiePart {
   final double startAngle;
   double sweepAngle;
   final Color color;
 
-  PeiPart(
+  PiePart(
     this.startAngle,
     this.sweepAngle,
     this.color,
@@ -23,24 +23,24 @@ class PeiPart {
   }
 }
 
-class PeiChart extends StatefulWidget {
+class PieChart extends StatefulWidget {
   final List<double> data;
   final List<String> legends;
 
-  const PeiChart({
+  const PieChart({
     @required this.data,
     this.legends,
   });
 
   @override
-  _PeiChartState createState() => _PeiChartState();
+  _PieChartState createState() => _PieChartState();
 }
 
-class _PeiChartState extends State<PeiChart> with TickerProviderStateMixin {
+class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
   AnimationController _controller;
   double _total = 0.0;
-  final _parts = <PeiPart>[];
-  final _animateParts = <PeiPart>[];
+  final _parts = <PiePart>[];
+  final _animateParts = <PiePart>[];
 
   @override
   void initState() {
@@ -58,14 +58,14 @@ class _PeiChartState extends State<PeiChart> with TickerProviderStateMixin {
     for (int i = 0; i < datas.length; i++) {
       final data = datas[i];
       final angle = (data / _total) * -math.pi * 2;
-      PeiPart peiPart;
+      PiePart peiPart;
 
       if (i > 0) {
         double lastSweepAngle = _parts[i - 1].sweepAngle;
         startAngle += lastSweepAngle;
-        peiPart = PeiPart(startAngle, angle, colors[i]);
+        peiPart = PiePart(startAngle, angle, colors[i]);
       } else {
-        peiPart = PeiPart(0.0, angle, colors[i]);
+        peiPart = PiePart(0.0, angle, colors[i]);
       }
 
       _parts.add(peiPart);
@@ -125,7 +125,7 @@ class _PeiChartState extends State<PeiChart> with TickerProviderStateMixin {
 
 class PeiChartPainter extends CustomPainter {
   final List<double> datas;
-  final List<PeiPart> parts;
+  final List<PiePart> parts;
   final List<String> legends;
 
   PeiChartPainter({
