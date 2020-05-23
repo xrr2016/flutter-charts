@@ -110,7 +110,7 @@ class BarChartPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     for (int i = 0; i < datas.length; i++) {
-      num data = datas[i];
+      double data = datas[i];
       double top = sh - data;
       double left = i * _width + (i * _gap) + _gap;
 
@@ -158,7 +158,6 @@ class BarChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // drawBorder(canvas, size);
     drawAxis(canvas, size);
     darwBar(canvas, size);
   }
