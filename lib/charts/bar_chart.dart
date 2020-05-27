@@ -39,7 +39,7 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
         ),
       );
       _controller.addListener(() {
-        _animations[i] = animation.value.floorToDouble();
+        _animations[i] = animation.value;
         setState(() {});
       });
     }
