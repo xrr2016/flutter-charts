@@ -38,9 +38,7 @@ class _AnimatedPathDemoState extends State<AnimatedPathDemo>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-    );
+    _controller = AnimationController(vsync: this);
   }
 
   @override
@@ -53,7 +51,7 @@ class _AnimatedPathDemoState extends State<AnimatedPathDemo>
 class AnimatedPathPainter extends CustomPainter {
   final Animation<double> _animation;
 
-  AnimatedPathPainter(this._animation) : super(repaint: _animation);
+  AnimatedPathPainter(this._animation);
 
   Path extractPathUntilLength(
     Path originalPath,
