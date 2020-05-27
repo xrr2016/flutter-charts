@@ -3,6 +3,47 @@ import 'dart:ui';
 import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
 
+Path createAnimatedPath(
+  Path path,
+  double percent,
+) {
+  final totalLength = path
+      .computeMetrics()
+      .fold(0.0, (double prev, PathMetric metric) => prev + metric.length);
+  final currentLength = totalLength * percent;
+
+  return extractPathUntilLength(path, currentLength);
+}
+
+Path extractPathUntilLength(
+  Path originalPath,
+  double length,
+) {
+  final path = Path();
+  var currentLength = 0.0;
+  var metricsIterator = originalPath.computeMetrics().iterator;
+
+  while (metricsIterator.moveNext()) {
+    var metric = metricsIterator.current;
+    var nextLength = currentLength + metric.length;
+    final isLastSegment = nextLength > length;
+
+    if (isLastSegment) {
+      final remainingLength = length - currentLength;
+      final pathSegment = metric.extractPath(0.0, remainingLength);
+      path.addPath(pathSegment, Offset.zero);
+      break;
+    } else {
+      final pathSegment = metric.extractPath(0.0, metric.length);
+      path.addPath(pathSegment, Offset.zero);
+    }
+
+    currentLength = nextLength;
+  }
+
+  return path;
+}
+
 class LineChart extends StatefulWidget {
   final List<double> data;
   final List<String> xAxis;
@@ -20,14 +61,6 @@ class _LineChartState extends State<LineChart>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   final _animationPoints = <double>[];
-  final _animationLinePoints = <double>[];
-
-  // Stream<double> _pointsStream() async* {
-  //   for (int i = 0; i < widget.data.length; i++) {
-  //     await Future.delayed(Duration(seconds: 1));
-  //     yield widget.data[i];
-  //   }
-  // }
 
   @override
   void initState() {
@@ -75,6 +108,7 @@ class _LineChartState extends State<LineChart>
           painter: LineChartPainter(
             xAxis: widget.xAxis,
             datas: widget.data,
+            animation: _controller,
             points: _animationPoints,
           ),
           child: Container(width: 300, height: 300),
@@ -103,12 +137,14 @@ class LineChartPainter extends CustomPainter {
   final List<double> datas;
   final List<String> xAxis;
   final List<double> points;
+  final Animation<double> animation;
 
   LineChartPainter({
     @required this.datas,
     @required this.xAxis,
+    @required this.animation,
     this.points,
-  });
+  }) : super(repaint: animation);
 
   void drawLines(Canvas canvas, Size size) {
     final sw = size.width;
@@ -122,26 +158,17 @@ class LineChartPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round
       ..strokeWidth = 1.5;
 
-    final points = <Offset>[];
+    final path = Path()..moveTo(gap / 2, sh - datas[0]);
 
-    // Path path = Path();
-    // path.moveTo(0, size.height / 2);
-    // // path.quadraticBezierTo(
-    // //     size.width / 2, size.height, size.width, size.height / 2);
-    // path.cubicTo(size.width / 4, 3 * size.height / 4, 3 * size.width / 4,
-    //     size.height / 4, size.width, size.height);
-    // canvas.drawPath(path, paint);
-
-    for (int i = 0; i < datas.length; i++) {
+    for (int i = 1; i < datas.length; i++) {
       final data = datas[i];
-      final dx = 0.0;
-      final dy = sh - data;
-      final offset = Offset(dx + gap * i + gap / 2, dy);
+      final x = gap * i + gap / 2;
+      final y = sh - data;
 
-      points.add(offset);
+      path.lineTo(x, y);
     }
 
-    canvas.drawPoints(PointMode.polygon, points, paint);
+    canvas.drawPath(createAnimatedPath(path, animation.value), paint);
   }
 
   void drawPoints(Canvas canvas, Size size) {

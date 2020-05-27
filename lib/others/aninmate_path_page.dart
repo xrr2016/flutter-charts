@@ -29,6 +29,13 @@ class _AnimatePathPageState extends State<AnimatePathPage>
       appBar: AppBar(
         title: Text('Animate Path'),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.play_arrow),
+        onPressed: () {
+          _controller.reset();
+          _controller.forward();
+        },
+      ),
       body: Center(
         child: CustomPaint(
           painter: MyPathPainter(_controller),
@@ -55,7 +62,6 @@ Path createAnimatedPath(
   final totalLength = originalPath
       .computeMetrics()
       .fold(0.0, (double prev, PathMetric metric) => prev + metric.length);
-
   final currentLength = totalLength * animationPercent;
 
   return extractPathUntilLength(originalPath, currentLength);
@@ -65,8 +71,8 @@ Path extractPathUntilLength(
   Path originalPath,
   double length,
 ) {
-  var currentLength = 0.0;
   final path = Path();
+  var currentLength = 0.0;
   var metricsIterator = originalPath.computeMetrics().iterator;
 
   while (metricsIterator.moveNext()) {
@@ -78,10 +84,8 @@ Path extractPathUntilLength(
       final remainingLength = length - currentLength;
       final pathSegment = metric.extractPath(0.0, remainingLength);
       path.addPath(pathSegment, Offset.zero);
-
       break;
     } else {
-      // There might be a more efficient way of extracting an entire path
       final pathSegment = metric.extractPath(0.0, metric.length);
       path.addPath(pathSegment, Offset.zero);
     }
@@ -103,7 +107,10 @@ class MyPathPainter extends CustomPainter {
     final sh = size.height;
     Path originalPath = Path()
       ..moveTo(sw / 2, 0)
-      ..lineTo(sw / 2, sh);
+      ..lineTo(0, sh / 2)
+      ..lineTo(sw / 2, sh)
+      ..lineTo(sw, sh / 2)
+      ..close();
 
     final paint = Paint()
       ..style = PaintingStyle.stroke

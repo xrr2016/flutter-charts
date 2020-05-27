@@ -1,3 +1,4 @@
+import 'package:custom_paint/line_chart_page.dart';
 import 'package:flutter/material.dart';
 
 import 'others/animated_path_demo.dart';
@@ -10,7 +11,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AnimatePathPage(),
+      home: LineChartPage(),
     );
   }
 }
