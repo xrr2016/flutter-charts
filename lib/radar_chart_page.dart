@@ -11,7 +11,15 @@ class _RadarChartPageState extends State<RadarChartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RadarChart(),
+      body: Center(
+        child: RadarChart(
+          datas: [
+            [30, 20, 28, 15, 16],
+            // [15, 30, 8, 24, 23]
+          ],
+          features: ["学习能力", "英语水平", "编码能力", "解决问题能力", "工作态度"],
+        ),
+      ),
     );
   }
 }

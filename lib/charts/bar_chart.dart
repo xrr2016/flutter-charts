@@ -1,3 +1,4 @@
+import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
 
 class BarChart extends StatefulWidget {
@@ -62,13 +63,20 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
             ),
           ),
         ),
-        SizedBox(height: 24),
-        IconButton(
-          icon: Icon(Icons.refresh),
-          onPressed: () {
-            _controller.reset();
-            _controller.forward();
-          },
+        SizedBox(height: 48),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            color: Colors.white,
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              _controller.reset();
+              _controller.forward();
+            },
+          ),
         ),
       ],
     );
@@ -105,11 +113,10 @@ class BarChartPainter extends CustomPainter {
 
   void darwBar(Canvas canvas, Size size) {
     final sh = size.height;
-    final paint = Paint()
-      ..color = Colors.blue
-      ..style = PaintingStyle.fill;
+    final paint = Paint()..style = PaintingStyle.fill;
 
     for (int i = 0; i < datas.length; i++) {
+      paint.color = colors[i];
       double data = datas[i];
       double top = sh - data;
       double left = i * _width + (i * _gap) + _gap;
@@ -120,10 +127,10 @@ class BarChartPainter extends CustomPainter {
 
       TextPainter(
         text: TextSpan(
-          text: '$data',
+          text: '${data.toStringAsFixed(2)}',
           style: TextStyle(
             fontSize: 14,
-            color: Colors.blueAccent,
+            color: paint.color,
           ),
         ),
         textDirection: TextDirection.ltr,

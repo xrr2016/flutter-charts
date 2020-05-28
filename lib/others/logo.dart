@@ -70,31 +70,7 @@ class LogoPainter extends CustomPainter {
 
     canvas.drawPath(pathOne, paintOne);
 
-    Paint paintTwo = Paint()
-      ..color = blue0
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill;
-
-    Path pathTwo = Path()
-      ..moveTo(58, 190)
-      ..lineTo(129, 118)
-      ..lineTo(206, 118)
-      ..lineTo(99, 230)
-      ..close();
-
     // canvas.drawPath(pathTwo, paintTwo);
-
-    Paint paintThree = Paint()
-      ..color = blue2
-      ..style = PaintingStyle.fill
-      ..isAntiAlias = true;
-
-    Path pathThree = Path()
-      ..moveTo(58, 190)
-      ..lineTo(98, 150)
-      ..lineTo(206, 260)
-      ..lineTo(126, 260)
-      ..close();
 
     // canvas.drawPath(pathThree, paintThree);
   }

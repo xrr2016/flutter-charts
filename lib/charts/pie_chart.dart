@@ -40,7 +40,6 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
   AnimationController _controller;
   double _total = 0.0;
   final _parts = <PiePart>[];
-  final _animateParts = <PiePart>[];
 
   @override
   void initState() {
@@ -69,7 +68,6 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
       }
 
       _parts.add(peiPart);
-      _animateParts.add(peiPart);
 
       final tween = Tween(begin: 0.0, end: peiPart.sweepAngle);
       Animation<double> animation = tween.animate(
@@ -79,7 +77,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
         ),
       );
       _controller.addListener(() {
-        _animateParts[i].sweepAngle = animation.value;
+        _parts[i].sweepAngle = animation.value;
         setState(() {});
       });
     }
@@ -97,9 +95,9 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
           height: 300,
           child: CustomPaint(
             painter: PeiChartPainter(
+              parts: _parts,
               datas: widget.data,
               legends: widget.legends,
-              parts: _animateParts,
             ),
           ),
         ),
@@ -179,14 +177,14 @@ class PeiChartPainter extends CustomPainter {
       final legend = legends[i];
       final radians = part.startAngle + part.sweepAngle / 2;
 
-      double x = math.cos(radians) * radius / 2 + sw / 2 - 12;
+      double x = math.cos(radians) * radius / 2 + sw / 2 - 22;
       double y = math.sin(radians) * radius / 2 + sh / 2;
       final offset = Offset(x, y);
 
       TextPainter(
         textAlign: TextAlign.start,
         text: TextSpan(
-          text: '$data',
+          text: '$data%',
           style: TextStyle(
             fontSize: 12,
             color: Colors.white,

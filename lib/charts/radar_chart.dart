@@ -1,21 +1,56 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
-class RadarChart extends StatelessWidget {
+class RadarChart extends StatefulWidget {
+  final List datas;
+  final List features;
+
+  const RadarChart({
+    @required this.datas,
+    @required this.features,
+  });
+
+  @override
+  _RadarChartState createState() => _RadarChartState();
+}
+
+class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
+  AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 3000),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      size: Size(double.infinity, double.infinity),
-      painter: RadarChartPainter(),
+      size: Size(300, 300),
+      painter: RadarChartPainter(
+        datas: widget.datas,
+        features: widget.features,
+        animation: _controller,
+      ),
     );
   }
 }
 
 class RadarChartPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    print(size);
+  final List datas;
+  final List features;
+  final Animation<double> animation;
+
+  RadarChartPainter({
+    @required this.datas,
+    @required this.features,
+    @required this.animation,
+  }) : super(repaint: animation);
+
+  void _drawCircles(Canvas canvas, Size size) {
     double centerX = size.width / 2.0;
     double centerY = size.height / 2.0;
     Offset centerOffset = Offset(centerX, centerY);
@@ -28,6 +63,15 @@ class RadarChartPainter extends CustomPainter {
       ..isAntiAlias = true;
 
     canvas.drawCircle(centerOffset, radius, outlinePaint);
+  }
+
+  void paint(Canvas canvas, Size size) {
+    double centerX = size.width / 2.0;
+    double centerY = size.height / 2.0;
+    Offset centerOffset = Offset(centerX, centerY);
+    double radius = centerX * 0.8;
+
+    _drawCircles(canvas, size);
 
     var ticks = [10, 20, 30];
     var tickDistance = radius / (ticks.length + 1);
@@ -60,7 +104,6 @@ class RadarChartPainter extends CustomPainter {
       },
     );
 
-    var features = ["AA", "BB", "CC", "DD", "EE"];
     var angle = (2 * pi) / features.length;
     const double featureLabelFontSize = 16;
     const double featureLabelFontWidth = 12;
@@ -103,12 +146,8 @@ class RadarChartPainter extends CustomPainter {
 
     const graphColors = [Colors.green, Colors.blue];
     var scale = radius / ticks.last;
-    var data = [
-      [30, 20, 28, 15, 16],
-      [15, 30, 8, 24, 23]
-    ];
 
-    data.asMap().forEach(
+    datas.asMap().forEach(
       (index, graph) {
         var graphPaint = Paint()
           ..color = graphColors[index % graphColors.length].withOpacity(0.3)

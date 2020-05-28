@@ -92,7 +92,6 @@ class _LineChartState extends State<LineChart>
       );
       _controller.addListener(() {
         _animationPoints[i] = animation.value;
-        setState(() {});
       });
     }
 
@@ -113,7 +112,7 @@ class _LineChartState extends State<LineChart>
           ),
           child: Container(width: 300, height: 300),
         ),
-        SizedBox(height: 24),
+        SizedBox(height: 48),
         Container(
           decoration: BoxDecoration(
             color: Colors.blue,
@@ -142,8 +141,8 @@ class LineChartPainter extends CustomPainter {
   LineChartPainter({
     @required this.datas,
     @required this.xAxis,
+    @required this.points,
     @required this.animation,
-    this.points,
   }) : super(repaint: animation);
 
   void drawLines(Canvas canvas, Size size) {
@@ -194,7 +193,7 @@ class LineChartPainter extends CustomPainter {
         text: TextSpan(
           text: '$data',
           style: TextStyle(
-            fontSize: 14,
+            fontSize: points[i] * 3,
             color: Colors.black87,
           ),
         ),
