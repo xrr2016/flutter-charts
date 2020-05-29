@@ -2,10 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class RadarChart extends StatefulWidget {
-  final List datas;
+  final List<List<double>> datas;
+  final List<double> scores;
   final List features;
 
   const RadarChart({
+    @required this.scores,
     @required this.datas,
     @required this.features,
   });
@@ -32,6 +34,7 @@ class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
       size: Size(300, 300),
       painter: RadarChartPainter(
         datas: widget.datas,
+        scores: widget.scores,
         features: widget.features,
         animation: _controller,
       ),
@@ -41,111 +44,154 @@ class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
 
 class RadarChartPainter extends CustomPainter {
   final List datas;
+  final List scores;
   final List features;
   final Animation<double> animation;
 
   RadarChartPainter({
+    @required this.scores,
     @required this.datas,
     @required this.features,
     @required this.animation,
   }) : super(repaint: animation);
 
-  void _drawCircles(Canvas canvas, Size size) {
-    double centerX = size.width / 2.0;
-    double centerY = size.height / 2.0;
-    Offset centerOffset = Offset(centerX, centerY);
-    double radius = centerX * 0.8;
-
+  void _drawOutline(Canvas canvas, Size size) {
     Paint outlinePaint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..isAntiAlias = true;
-
-    canvas.drawCircle(centerOffset, radius, outlinePaint);
-  }
-
-  void paint(Canvas canvas, Size size) {
-    double centerX = size.width / 2.0;
-    double centerY = size.height / 2.0;
-    Offset centerOffset = Offset(centerX, centerY);
-    double radius = centerX * 0.8;
-
-    _drawCircles(canvas, size);
-
-    var ticks = [10, 20, 30];
-    var tickDistance = radius / (ticks.length + 1);
-    const double tickLabelFontSize = 12;
-
-    var ticksPaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0
       ..isAntiAlias = true;
 
-    ticks.sublist(0, ticks.length).asMap().forEach(
-      (index, tick) {
-        double tickRadius = tickDistance * (index + 1);
+    double centerX = size.width / 2.0;
+    double centerY = size.height / 2.0;
+    Offset centerOffset = Offset(centerX, centerY);
+    double radius = centerX * 0.8;
 
-        canvas.drawCircle(centerOffset, tickRadius, ticksPaint);
+    canvas.drawCircle(centerOffset, radius, outlinePaint);
+  }
 
-        TextPainter(
-          text: TextSpan(
-            text: tick.toString(),
-            style: TextStyle(color: Colors.grey, fontSize: tickLabelFontSize),
+  void _drawScores(Canvas canvas, Size size) {
+    double centerX = size.width / 2.0;
+    double centerY = size.height / 2.0;
+    Offset centerOffset = Offset(centerX, centerY);
+    double radius = centerX * 0.8;
+
+    double scoreDistance = radius / (scores.length + 1);
+    const double scoreLabelFontSize = 12;
+
+    Paint scoresPaint = Paint()
+      ..color = Colors.grey[500]
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0
+      ..isAntiAlias = true;
+
+    scores.asMap().forEach((index, score) {
+      double scoreRadius = scoreDistance * (index + 1);
+      canvas.drawCircle(centerOffset, scoreRadius, scoresPaint);
+      TextPainter(
+        text: TextSpan(
+          text: score.toString(),
+          style: TextStyle(color: Colors.grey, fontSize: scoreLabelFontSize),
+        ),
+        textDirection: TextDirection.ltr,
+      )
+        ..layout(minWidth: 0, maxWidth: size.width)
+        ..paint(
+          canvas,
+          Offset(
+            centerX - scoreLabelFontSize,
+            centerY - scoreRadius - scoreLabelFontSize,
           ),
-          textDirection: TextDirection.ltr,
-        )
-          ..layout(minWidth: 0, maxWidth: size.width)
-          ..paint(
-            canvas,
-            Offset(centerX, centerY - tickRadius - tickLabelFontSize),
-          );
-      },
-    );
+        );
+    });
+  }
 
-    var angle = (2 * pi) / features.length;
+  void _drawRotateText({
+    @required Canvas canvas,
+    @required Size size,
+    @required String text,
+    @required Offset offset,
+    @required double radius,
+    Color color = Colors.black,
+    double fontSize = 12.0,
+  }) {
+    canvas.save();
+    // canvas.translate(size.width / 4, size.height / 4);
+    canvas.rotate(radius);
+
+    TextPainter(
+      text: TextSpan(
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+        ),
+        text: text,
+      ),
+      textAlign: TextAlign.left,
+      textDirection: TextDirection.ltr,
+    )
+      ..layout(minWidth: 0, maxWidth: size.width)
+      ..paint(canvas, offset);
+    canvas.restore();
+  }
+
+  void _drawFetures(Canvas canvas, Size size) {
+    double centerX = size.width / 2.0;
+    double centerY = size.height / 2.0;
+    Offset centerOffset = Offset(centerX, centerY);
+    double radius = centerX * 0.8;
+
+    double angle = (2 * pi) / features.length;
     const double featureLabelFontSize = 16;
     const double featureLabelFontWidth = 12;
 
     features.asMap().forEach(
       (index, feature) {
-        var xAngle = cos(angle * index - pi / 2);
-        var yAngle = sin(angle * index - pi / 2);
+        double xAngle = cos(angle * index - pi / 2);
+        double yAngle = sin(angle * index - pi / 2);
 
-        var featureOffset = Offset(
+        Offset featureOffset = Offset(
           centerX + radius * xAngle,
           centerY + radius * yAngle,
         );
 
-        canvas.drawLine(centerOffset, featureOffset, ticksPaint);
+        Paint linePaint = Paint()
+          ..color = Colors.grey[500]
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0
+          ..isAntiAlias = true;
 
-        var labelYOffset = yAngle < 0 ? -featureLabelFontSize : 0;
-        var labelXOffset =
-            xAngle < 0 ? -featureLabelFontWidth * feature.length : 0;
+        canvas.drawLine(centerOffset, featureOffset, linePaint);
 
-        TextPainter(
-          text: TextSpan(
-            text: feature,
-            style:
-                TextStyle(color: Colors.black, fontSize: featureLabelFontSize),
+        double labelYOffset =
+            yAngle < 0 ? -featureLabelFontSize * 1.5 : featureLabelFontSize / 2;
+        double labelXOffset = xAngle < 0
+            ? -featureLabelFontWidth * (feature.length + 1)
+            : -featureLabelFontWidth;
+
+        _drawRotateText(
+          canvas: canvas,
+          size: size,
+          text: feature,
+          radius: 0.0,
+          fontSize: featureLabelFontSize,
+          offset: Offset(
+            featureOffset.dx + labelXOffset,
+            featureOffset.dy + labelYOffset,
           ),
-          textAlign: TextAlign.center,
-          textDirection: TextDirection.ltr,
-        )
-          ..layout(minWidth: 0, maxWidth: size.width)
-          ..paint(
-            canvas,
-            Offset(
-              featureOffset.dx + labelXOffset,
-              featureOffset.dy + labelYOffset,
-            ),
-          );
+        );
       },
     );
+  }
 
+  void _drawDatas(Canvas canvas, Size size) {
+    double centerX = size.width / 2.0;
+    double centerY = size.height / 2.0;
+    double radius = centerX * 0.8;
+
+    var angle = (2 * pi) / features.length;
     const graphColors = [Colors.green, Colors.blue];
-    var scale = radius / ticks.last;
+    var scale = radius / scores.last;
 
     datas.asMap().forEach(
       (index, graph) {
@@ -181,6 +227,13 @@ class RadarChartPainter extends CustomPainter {
         canvas.drawPath(path, graphOutlinePaint);
       },
     );
+  }
+
+  void paint(Canvas canvas, Size size) {
+    _drawOutline(canvas, size);
+    _drawScores(canvas, size);
+    _drawFetures(canvas, size);
+    _drawDatas(canvas, size);
   }
 
   @override
