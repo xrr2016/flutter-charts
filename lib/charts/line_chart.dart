@@ -5,11 +5,11 @@ import 'package:custom_paint/utils/create_animated_path.dart';
 import 'package:flutter/material.dart';
 
 class LineChart extends StatefulWidget {
-  final List<double> data;
+  final List<double> datas;
   final List<String> xAxis;
 
   const LineChart({
-    @required this.data,
+    @required this.datas,
     @required this.xAxis,
   });
 
@@ -28,7 +28,7 @@ class _LineChartState extends State<LineChart>
     double begin = 0.0;
     double end = 4.0;
 
-    List<double> datas = widget.data;
+    List<double> datas = widget.datas;
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
@@ -66,7 +66,7 @@ class _LineChartState extends State<LineChart>
         CustomPaint(
           painter: LineChartPainter(
             xAxis: widget.xAxis,
-            datas: widget.data,
+            datas: widget.datas,
             animation: _controller,
             points: _animationPoints,
           ),

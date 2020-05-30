@@ -1,14 +1,16 @@
 import 'dart:math';
+import 'package:custom_paint/colors.dart';
+import 'package:custom_paint/utils/create_animated_path.dart';
 import 'package:flutter/material.dart';
 
 class RadarChart extends StatefulWidget {
-  final List<List<double>> datas;
   final List<double> scores;
-  final List features;
+  final List<String> features;
+  final List<List<double>> datas;
 
   const RadarChart({
-    @required this.scores,
     @required this.datas,
+    @required this.scores,
     @required this.features,
   });
 
@@ -18,6 +20,7 @@ class RadarChart extends StatefulWidget {
 
 class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
   AnimationController _controller;
+  List<List<double>> _animationDatas = [];
 
   @override
   void initState() {
@@ -25,27 +28,47 @@ class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
-    );
+    )..forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(300, 300),
-      painter: RadarChartPainter(
-        datas: widget.datas,
-        scores: widget.scores,
-        features: widget.features,
-        animation: _controller,
-      ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        CustomPaint(
+          size: Size(300, 300),
+          painter: RadarChartPainter(
+            datas: widget.datas,
+            scores: widget.scores,
+            features: widget.features,
+            animation: _controller,
+          ),
+        ),
+        SizedBox(height: 48),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            color: Colors.white,
+            icon: Icon(Icons.refresh),
+            onPressed: () {
+              _controller.reset();
+              _controller.forward();
+            },
+          ),
+        ),
+      ],
     );
   }
 }
 
 class RadarChartPainter extends CustomPainter {
-  final List datas;
-  final List scores;
-  final List features;
+  final List<String> features;
+  final List<double> scores;
+  final List<List<double>> datas;
   final Animation<double> animation;
 
   RadarChartPainter({
@@ -77,7 +100,7 @@ class RadarChartPainter extends CustomPainter {
     double radius = centerX * 0.8;
 
     double scoreDistance = radius / (scores.length + 1);
-    const double scoreLabelFontSize = 12;
+    const double scoreLabelFontSize = 10;
 
     Paint scoresPaint = Paint()
       ..color = Colors.grey[500]
@@ -116,7 +139,6 @@ class RadarChartPainter extends CustomPainter {
     double fontSize = 12.0,
   }) {
     canvas.save();
-    // canvas.translate(size.width / 4, size.height / 4);
     canvas.rotate(radius);
 
     TextPainter(
@@ -127,7 +149,7 @@ class RadarChartPainter extends CustomPainter {
         ),
         text: text,
       ),
-      textAlign: TextAlign.left,
+      textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
     )
       ..layout(minWidth: 0, maxWidth: size.width)
@@ -142,7 +164,7 @@ class RadarChartPainter extends CustomPainter {
     double radius = centerX * 0.8;
 
     double angle = (2 * pi) / features.length;
-    const double featureLabelFontSize = 16;
+    const double featureLabelFontSize = 14;
     const double featureLabelFontWidth = 12;
 
     features.asMap().forEach(
@@ -164,10 +186,10 @@ class RadarChartPainter extends CustomPainter {
         canvas.drawLine(centerOffset, featureOffset, linePaint);
 
         double labelYOffset =
-            yAngle < 0 ? -featureLabelFontSize * 1.5 : featureLabelFontSize / 2;
+            yAngle < 0 ? -featureLabelFontSize * 2.5 : featureLabelFontSize * 2;
         double labelXOffset = xAngle < 0
             ? -featureLabelFontWidth * (feature.length + 1)
-            : -featureLabelFontWidth;
+            : -featureLabelFontWidth / 1.5;
 
         _drawRotateText(
           canvas: canvas,
@@ -190,41 +212,68 @@ class RadarChartPainter extends CustomPainter {
     double radius = centerX * 0.8;
 
     var angle = (2 * pi) / features.length;
-    const graphColors = [Colors.green, Colors.blue];
     var scale = radius / scores.last;
 
     datas.asMap().forEach(
       (index, graph) {
-        var graphPaint = Paint()
-          ..color = graphColors[index % graphColors.length].withOpacity(0.3)
+        Paint graphPaint = Paint()
+          ..color = colors[index % colors.length].withOpacity(0.2)
           ..style = PaintingStyle.fill;
 
-        var graphOutlinePaint = Paint()
-          ..color = graphColors[index % graphColors.length]
+        Color outLineColor = colors[index % colors.length];
+
+        Paint graphOutlinePaint = Paint()
+          ..color = outLineColor
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.0
           ..isAntiAlias = true;
 
-        // Start the graph on the initial point
-        var scaledPoint = scale * graph[0];
-        var path = Path();
-
+        Path path = Path();
+        double scoreSize = 12.0;
+        double scaledPoint = scale * graph[0];
         path.moveTo(centerX, centerY - scaledPoint);
+
+        _drawRotateText(
+          canvas: canvas,
+          size: size,
+          text: graph[0].toStringAsFixed(1),
+          radius: 0.0,
+          fontSize: scoreSize,
+          color: outLineColor,
+          offset: Offset(centerX, centerY - scaledPoint),
+        );
 
         graph.sublist(1).asMap().forEach(
           (index, point) {
-            var xAngle = cos(angle * (index + 1) - pi / 2);
-            var yAngle = sin(angle * (index + 1) - pi / 2);
-            var scaledPoint = scale * point;
+            double scaledPoint = scale * point;
+            double xAngle = cos(angle * (index + 1) - pi / 2);
+            double yAngle = sin(angle * (index + 1) - pi / 2);
+            double x = centerX + scaledPoint * xAngle;
+            double y = centerY + scaledPoint * yAngle;
 
-            path.lineTo(
-                centerX + scaledPoint * xAngle, centerY + scaledPoint * yAngle);
+            path.lineTo(x, y);
+
+            _drawRotateText(
+              canvas: canvas,
+              size: size,
+              text: point.toStringAsFixed(1),
+              radius: 0.0,
+              fontSize: scoreSize,
+              color: outLineColor,
+              offset: Offset(x - scoreSize, y),
+            );
           },
         );
 
         path.close();
-        canvas.drawPath(path, graphPaint);
-        canvas.drawPath(path, graphOutlinePaint);
+        canvas.drawPath(
+          createAnimatedPath(path, animation.value),
+          graphPaint,
+        );
+        canvas.drawPath(
+          createAnimatedPath(path, animation.value),
+          graphOutlinePaint,
+        );
       },
     );
   }
