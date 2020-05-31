@@ -26,11 +26,11 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
-    );
+    )..forward();
 
     for (int i = 0; i < datas.length; i++) {
-      final end = datas[i];
-      final tween = Tween(begin: begin, end: end);
+      final double end = datas[i];
+      final Tween<double> tween = Tween(begin: begin, end: end);
       _animations.add(begin);
 
       Animation<double> animation = tween.animate(
@@ -40,12 +40,11 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
         ),
       );
       _controller.addListener(() {
-        _animations[i] = animation.value;
-        setState(() {});
+        setState(() {
+          _animations[i] = animation.value;
+        });
       });
     }
-
-    _controller.forward();
   }
 
   @override
