@@ -58,9 +58,8 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
           height: 300,
           child: CustomPaint(
             painter: BarChartPainter(
-              datas: widget.data,
+              datas: _animations,
               xAxis: widget.xAxis,
-              animateDatas: _animations,
               animation: _controller,
             ),
           ),
@@ -88,7 +87,6 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
 class BarChartPainter extends CustomPainter {
   final List<double> datas;
   final List<String> xAxis;
-  final List<double> animateDatas;
   final Animation<double> animation;
 
   static double _barGap = 18;
@@ -98,7 +96,6 @@ class BarChartPainter extends CustomPainter {
   BarChartPainter({
     @required this.xAxis,
     @required this.datas,
-    @required this.animateDatas,
     this.animation,
   }) : super(repaint: animation);
 
@@ -110,7 +107,8 @@ class BarChartPainter extends CustomPainter {
       ..color = lineColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
-    final path = Path()
+
+    final Path path = Path()
       ..moveTo(0, 0)
       ..lineTo(0, sh)
       ..lineTo(sw, sh);
@@ -119,86 +117,66 @@ class BarChartPainter extends CustomPainter {
   }
 
   void _drawLabels(Canvas canvas, Size size) {
-    final sh = size.height;
-    final List<double> yAxisLabels = [];
     final double gap = 50;
+    final double sh = size.height;
+    final List<double> yAxisLabels = [];
 
     Paint paint = Paint()
       ..color = Colors.black87
       ..strokeWidth = 2.0;
 
-    for (int i = 1; i < datas.length + 1; i++) {
+    for (int i = 0; i < datas.length + 1; i++) {
       yAxisLabels.add(gap * i);
     }
 
-    yAxisLabels.asMap().forEach((index, label) {
-      final double top = sh - label;
-      final Offset textOffset =
-          Offset(0 - labelFontSize * 3, top - labelFontSize / 2);
-      final rect = Rect.fromLTWH(0, top, 4, 1);
-      canvas.drawRect(rect, paint);
+    yAxisLabels.asMap().forEach(
+      (index, label) {
+        final double top = sh - label;
+        final rect = Rect.fromLTWH(0, top, 4, 1);
+        final Offset textOffset = Offset(
+          0 - labelFontSize * 3,
+          top - labelFontSize / 2,
+        );
 
-      TextPainter(
-        text: TextSpan(
-          text: label.toStringAsFixed(0),
-          style: TextStyle(
-            fontSize: labelFontSize,
-            color: Colors.black87,
+        canvas.drawRect(rect, paint);
+
+        TextPainter(
+          text: TextSpan(
+            text: label.toStringAsFixed(0),
+            style: TextStyle(fontSize: labelFontSize, color: Colors.black87),
           ),
-        ),
-        textWidthBasis: TextWidthBasis.longestLine,
-        textAlign: TextAlign.right,
-        textDirection: TextDirection.ltr,
-      )
-        ..layout(
-          minWidth: 0,
-          maxWidth: 24,
+          textAlign: TextAlign.right,
+          textDirection: TextDirection.ltr,
+          textWidthBasis: TextWidthBasis.longestLine,
         )
-        ..paint(canvas, textOffset);
-    });
-
-    TextPainter(
-      text: TextSpan(
-        text: '0',
-        style: TextStyle(
-          fontSize: labelFontSize,
-          color: Colors.black87,
-        ),
-      ),
-      textAlign: TextAlign.right,
-      textDirection: TextDirection.ltr,
-      textWidthBasis: TextWidthBasis.longestLine,
-    )
-      ..layout(
-        minWidth: 0,
-        maxWidth: 24,
-      )
-      ..paint(canvas, Offset(0 - labelFontSize * 3, sh));
+          ..layout(minWidth: 0, maxWidth: 24)
+          ..paint(canvas, textOffset);
+      },
+    );
   }
 
   void _darwBars(Canvas canvas, Size size) {
     final sh = size.height;
     final paint = Paint()..style = PaintingStyle.fill;
 
-    for (int i = 0; i < animateDatas.length; i++) {
+    for (int i = 0; i < datas.length; i++) {
       paint.color = colors[i];
-      final double data = animateDatas[i];
+      final double textFontSize = 14.0;
+      final double data = datas[i];
       final double top = sh - data;
       final double left = i * _barWidth + (i * _barGap) + _barGap;
-      final double textFontSize = 14.0;
 
       final rect = Rect.fromLTWH(left, top, _barWidth, data);
       final offset = Offset(
-          left + _barWidth / 2 - textFontSize * 1.2, top - textFontSize * 2);
+        left + _barWidth / 2 - textFontSize * 1.2,
+        top - textFontSize * 2,
+      );
       canvas.drawRect(rect, paint);
 
       TextPainter(
         text: TextSpan(
           text: data.toStringAsFixed(1),
-          style: TextStyle(
-            fontSize: textFontSize,
-            color: paint.color,
-          ),
+          style: TextStyle(fontSize: textFontSize, color: paint.color),
         ),
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr,
@@ -216,10 +194,7 @@ class BarChartPainter extends CustomPainter {
         textAlign: TextAlign.center,
         text: TextSpan(
           text: '$xData',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black87,
-          ),
+          style: TextStyle(fontSize: 12, color: Colors.black87),
         ),
         textDirection: TextDirection.ltr,
       )
@@ -234,8 +209,8 @@ class BarChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     _drawAxis(canvas, size);
-    _darwBars(canvas, size);
     _drawLabels(canvas, size);
+    _darwBars(canvas, size);
   }
 
   @override
