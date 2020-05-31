@@ -20,7 +20,6 @@ class RadarChart extends StatefulWidget {
 
 class _RadarChartState extends State<RadarChart> with TickerProviderStateMixin {
   AnimationController _controller;
-  List<List<double>> _animationDatas = [];
 
   @override
   void initState() {

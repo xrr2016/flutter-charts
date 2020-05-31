@@ -87,8 +87,8 @@ class BarChartPainter extends CustomPainter {
   final List<double> datas;
   final List<String> xAxis;
 
-  double _width = 40;
   double _gap = 10;
+  double _width = 40;
 
   BarChartPainter({
     @required this.datas,
