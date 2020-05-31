@@ -121,13 +121,22 @@ class BarChartPainter extends CustomPainter {
   void _drawLabels(Canvas canvas, Size size) {
     final sh = size.height;
     final List<double> yAxisLabels = [];
-    final double gap = sh / datas.length;
+    final double gap = 50;
 
-    for (int i = 1; i < datas.length; i++) {
+    Paint paint = Paint()
+      ..color = Colors.black87
+      ..strokeWidth = 2.0;
+
+    for (int i = 1; i < datas.length + 1; i++) {
       yAxisLabels.add(gap * i);
     }
+
     yAxisLabels.asMap().forEach((index, label) {
-      final Offset offset = Offset(0 - labelFontSize * 3, sh - label);
+      final double top = sh - label;
+      final Offset textOffset =
+          Offset(0 - labelFontSize * 3, top - labelFontSize / 2);
+      final rect = Rect.fromLTWH(0, top, 4, 1);
+      canvas.drawRect(rect, paint);
 
       TextPainter(
         text: TextSpan(
@@ -145,7 +154,7 @@ class BarChartPainter extends CustomPainter {
           minWidth: 0,
           maxWidth: 24,
         )
-        ..paint(canvas, offset);
+        ..paint(canvas, textOffset);
     });
 
     TextPainter(
