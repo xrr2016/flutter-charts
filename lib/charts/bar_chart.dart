@@ -240,6 +240,7 @@ class Rectangle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: CustomPaint(
+        // 使用 RectanglePainter 在画布上绘制
         painter: RectanglePainter(),
         child: Container(
           width: 300,
@@ -259,13 +260,16 @@ class Rectangle extends StatelessWidget {
 class RectanglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    // 定义一个矩形
     final Rect rect = Rect.fromLTWH(50.0, 50.0, 100.0, 100.0);
+    // 指定绘制的样式
     final Paint paint = Paint()
       ..color = Colors.orange
       ..strokeWidth = 4.0
       ..style = PaintingStyle.stroke
       ..isAntiAlias = true;
 
+    // 使用 drawRect 绘制矩形
     canvas.drawRect(rect, paint);
   }
 
