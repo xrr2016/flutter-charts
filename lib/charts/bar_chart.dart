@@ -52,16 +52,13 @@ class _BarChartState extends State<BarChart> with TickerProviderStateMixin {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          width: 300,
-          height: 300,
-          child: CustomPaint(
-            painter: BarChartPainter(
-              datas: _animations,
-              xAxis: widget.xAxis,
-              animation: _controller,
-            ),
+        CustomPaint(
+          painter: BarChartPainter(
+            datas: _animations,
+            xAxis: widget.xAxis,
+            animation: _controller,
           ),
+          child: Container(width: 300, height: 300),
         ),
         SizedBox(height: 48),
         Container(
@@ -217,4 +214,42 @@ class BarChartPainter extends CustomPainter {
 
   @override
   bool shouldRebuildSemantics(BarChartPainter oldDelegate) => false;
+}
+
+class Rectangle extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: CustomPaint(
+        painter: RectanglePainter(),
+        child: Container(
+          width: 300,
+          height: 300,
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1.0,
+              color: Colors.grey[300],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class RectanglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Rect rect = Rect.fromLTWH(50.0, 50.0, 100.0, 100.0);
+    final Paint paint = Paint()
+      ..color = Colors.orange
+      ..strokeWidth = 4.0
+      ..style = PaintingStyle.stroke
+      ..isAntiAlias = true;
+
+    canvas.drawRect(rect, paint);
+  }
+
+  @override
+  bool shouldRepaint(RectanglePainter oldDelegate) => false;
 }
