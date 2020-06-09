@@ -20,11 +20,11 @@ class PiePart {
 }
 
 class PieChart extends StatefulWidget {
-  final List<double> data;
+  final List<double> datas;
   final List<String> legends;
 
   const PieChart({
-    @required this.data,
+    @required this.datas,
     @required this.legends,
   });
 
@@ -42,7 +42,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    List<double> datas = widget.data;
+    List<double> datas = widget.datas;
     _total = datas.reduce((a, b) => a + b);
     double startAngle = 0.0;
 
@@ -192,7 +192,7 @@ class PeiChartPainter extends CustomPainter {
 
     final paint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Colors.grey[300]
+      ..color = Colors.grey
       ..strokeWidth = 1.0;
 
     canvas.drawCircle(center, radius, paint);
