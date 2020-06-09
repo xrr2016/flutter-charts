@@ -106,7 +106,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
             ),
           ),
         ),
-        SizedBox(height: 24),
+        SizedBox(height: 80),
         Container(
           decoration: BoxDecoration(
             color: Colors.blue,
@@ -137,11 +137,10 @@ class PeiChartPainter extends CustomPainter {
     @required this.parts,
   });
 
-  double radius = 120.0;
-
   void drawParts(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
+    final double radius = math.min(sw, sh) / 2;
     final Offset center = Offset(sw / 2, sh / 2);
 
     final rect = Rect.fromCenter(
@@ -188,19 +187,24 @@ class PeiChartPainter extends CustomPainter {
   void drawCircle(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
+    final double radius = math.min(sw, sh) / 2;
+    // 定义中心点
     final Offset center = Offset(sw / 2, sh / 2);
 
+    // 定义圆形的绘制属性
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..color = Colors.grey
       ..strokeWidth = 1.0;
 
+    // 使用 Canvas 的 drawCircle 绘制
     canvas.drawCircle(center, radius, paint);
   }
 
   void drawLegends(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
+    final double radius = math.min(sw, sh) / 2;
 
     for (int i = 0; i < datas.length; i++) {
       final part = parts[i];
