@@ -187,6 +187,7 @@ class PeiChartPainter extends CustomPainter {
   void drawCircle(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
+    // 确定圆的半径
     final double radius = math.min(sw, sh) / 2;
     // 定义中心点
     final Offset center = Offset(sw / 2, sh / 2);
@@ -205,21 +206,25 @@ class PeiChartPainter extends CustomPainter {
     final sw = size.width;
     final sh = size.height;
     final double radius = math.min(sw, sh) / 2;
+    final double fontSize = 12.0;
 
     for (int i = 0; i < datas.length; i++) {
       final part = parts[i];
       final legend = legends[i];
+      // 根据每部分的起始弧度加上自身弧度值的一半得到每部分的中间弧度值
       final radians = part.startAngle + part.sweepAngle / 2;
+      // 根据三角函数计算中出标识文字的 x 和 y 位置
+      double x = math.cos(radians) * (radius + 32) + sw / 2 - fontSize;
+      double y = math.sin(radians) * (radius + 32) + sh / 2;
+      final offset = Offset(x, y);
 
-      double lx = math.cos(radians) * (radius + 32) + sw / 2 - 12;
-      double ly = math.sin(radians) * (radius + 32) + sh / 2 - 4;
-      final lOffset = Offset(lx, ly);
+      // 使用 TextPainter 绘制文字标识
       TextPainter(
         textAlign: TextAlign.center,
         text: TextSpan(
-          text: '$legend',
+          text: legend,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: fontSize,
             color: Colors.black,
           ),
         ),
@@ -229,14 +234,13 @@ class PeiChartPainter extends CustomPainter {
           minWidth: 0,
           maxWidth: size.width,
         )
-        ..paint(canvas, lOffset);
+        ..paint(canvas, offset);
     }
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     drawCircle(canvas, size);
-    drawParts(canvas, size);
     drawLegends(canvas, size);
   }
 
