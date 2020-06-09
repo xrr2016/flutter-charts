@@ -4,21 +4,17 @@ import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
 
 class PiePart {
-  final double startAngle;
   double sweepAngle;
   final Color color;
+  final double startAngle;
 
-  PiePart(
-    this.startAngle,
-    this.sweepAngle,
-    this.color,
-  );
+  PiePart(this.startAngle, this.sweepAngle, this.color);
 
   toMap() {
     return {
+      "color": color,
       "startAngle": startAngle,
       "sweepAngle": sweepAngle,
-      "color": color,
     };
   }
 }
@@ -29,7 +25,7 @@ class PieChart extends StatefulWidget {
 
   const PieChart({
     @required this.data,
-    this.legends,
+    @required this.legends,
   });
 
   @override
@@ -37,9 +33,10 @@ class PieChart extends StatefulWidget {
 }
 
 class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
-  AnimationController _controller;
   double _total = 0.0;
-  final _parts = <PiePart>[];
+  AnimationController _controller;
+  final List<PiePart> _parts = <PiePart>[];
+  List<double> _animateDatas = [];
 
   @override
   void initState() {
@@ -50,11 +47,12 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
     double startAngle = 0.0;
 
     _controller = AnimationController(
-      vsync: this,
       duration: Duration(milliseconds: 3000),
+      vsync: this,
     );
 
     for (int i = 0; i < datas.length; i++) {
+      _animateDatas.add(0.0);
       final data = datas[i];
       final angle = (data / _total) * -math.pi * 2;
       PiePart peiPart;
@@ -69,15 +67,22 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
 
       _parts.add(peiPart);
 
-      final tween = Tween(begin: 0.0, end: peiPart.sweepAngle);
-      Animation<double> animation = tween.animate(
-        CurvedAnimation(
-          parent: _controller,
-          curve: Curves.ease,
-        ),
+      CurvedAnimation curvedAnimation = CurvedAnimation(
+        parent: _controller,
+        curve: Curves.ease,
       );
+
+      final partTween = Tween<double>(begin: 0.0, end: peiPart.sweepAngle);
+      Animation<double> animation = partTween.animate(curvedAnimation);
+
+      final percentTween = Tween<double>(begin: 0.0, end: data);
+      Animation<double> percentAnimation =
+          percentTween.animate(curvedAnimation);
+
       _controller.addListener(() {
         _parts[i].sweepAngle = animation.value;
+        _animateDatas[i] =
+            double.parse(percentAnimation.value.toStringAsFixed(1));
         setState(() {});
       });
     }
@@ -96,7 +101,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
           child: CustomPaint(
             painter: PeiChartPainter(
               parts: _parts,
-              datas: widget.data,
+              datas: _animateDatas,
               legends: widget.legends,
             ),
           ),
@@ -137,46 +142,25 @@ class PeiChartPainter extends CustomPainter {
   void drawParts(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
-    Offset center = Offset(sw / 2, sh / 2);
+    final Offset center = Offset(sw / 2, sh / 2);
+
     final rect = Rect.fromCenter(
       center: center,
       width: radius * 2,
       height: radius * 2,
     );
     final paint = Paint()
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 0.0;
+      ..strokeWidth = 0.0
+      ..isAntiAlias = true
+      ..style = PaintingStyle.fill;
 
     for (int i = 0; i < parts.length; i++) {
-      final part = parts[i];
+      final PiePart part = parts[i];
       paint.color = part.color;
-
       canvas.drawArc(rect, part.startAngle, part.sweepAngle, true, paint);
-    }
-  }
 
-  void drawCircle(Canvas canvas, Size size) {
-    final sw = size.width;
-    final sh = size.height;
-    Offset center = Offset(sw / 2, sh / 2);
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = Colors.grey[300]
-      ..strokeWidth = 1.0;
-
-    canvas.drawCircle(center, radius, paint);
-  }
-
-  void drawLegends(Canvas canvas, Size size) {
-    final sw = size.width;
-    final sh = size.height;
-
-    for (int i = 0; i < datas.length; i++) {
       final data = datas[i];
-      final part = parts[i];
-      final legend = legends[i];
       final radians = part.startAngle + part.sweepAngle / 2;
-
       double x = math.cos(radians) * radius / 2 + sw / 2 - 22;
       double y = math.sin(radians) * radius / 2 + sh / 2;
       final offset = Offset(x, y);
@@ -198,6 +182,30 @@ class PeiChartPainter extends CustomPainter {
           maxWidth: size.width,
         )
         ..paint(canvas, offset);
+    }
+  }
+
+  void drawCircle(Canvas canvas, Size size) {
+    final sw = size.width;
+    final sh = size.height;
+    final Offset center = Offset(sw / 2, sh / 2);
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = Colors.grey[300]
+      ..strokeWidth = 1.0;
+
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  void drawLegends(Canvas canvas, Size size) {
+    final sw = size.width;
+    final sh = size.height;
+
+    for (int i = 0; i < datas.length; i++) {
+      final part = parts[i];
+      final legend = legends[i];
+      final radians = part.startAngle + part.sweepAngle / 2;
 
       double lx = math.cos(radians) * (radius + 32) + sw / 2 - 12;
       double ly = math.sin(radians) * (radius + 32) + sh / 2 - 4;
