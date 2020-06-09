@@ -8,15 +8,11 @@ class PiePart {
   final Color color;
   final double startAngle;
 
-  PiePart(this.startAngle, this.sweepAngle, this.color);
-
-  toMap() {
-    return {
-      "color": color,
-      "startAngle": startAngle,
-      "sweepAngle": sweepAngle,
-    };
-  }
+  PiePart(
+    this.startAngle,
+    this.sweepAngle,
+    this.color,
+  );
 }
 
 class PieChart extends StatefulWidget {
@@ -35,36 +31,40 @@ class PieChart extends StatefulWidget {
 class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
   double _total = 0.0;
   AnimationController _controller;
-  final List<PiePart> _parts = <PiePart>[];
   List<double> _animateDatas = [];
+  final List<PiePart> _parts = <PiePart>[];
 
   @override
   void initState() {
     super.initState();
-
-    List<double> datas = widget.datas;
-    _total = datas.reduce((a, b) => a + b);
-    double startAngle = 0.0;
 
     _controller = AnimationController(
       duration: Duration(milliseconds: 3000),
       vsync: this,
     );
 
+    List<double> datas = widget.datas;
+    // 计算出数据总和
+    _total = datas.reduce((a, b) => a + b);
+    // 设置一个起始变量
+    double startAngle = 0.0;
+
     for (int i = 0; i < datas.length; i++) {
-      _animateDatas.add(0.0);
       final data = datas[i];
+      // 计算出每个数据所占的弧度值
       final angle = (data / _total) * -math.pi * 2;
       PiePart peiPart;
 
       if (i > 0) {
+        // 下一个数据的起始弧度值等于之前的弧度值相加
         double lastSweepAngle = _parts[i - 1].sweepAngle;
         startAngle += lastSweepAngle;
         peiPart = PiePart(startAngle, angle, colors[i]);
       } else {
+        // 第一个数据的起始弧度为 0.0
         peiPart = PiePart(0.0, angle, colors[i]);
       }
-
+      // 添加到数组中
       _parts.add(peiPart);
 
       CurvedAnimation curvedAnimation = CurvedAnimation(
@@ -86,7 +86,6 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
         setState(() {});
       });
     }
-
     _controller.forward();
   }
 
@@ -100,6 +99,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
           height: 300,
           child: CustomPaint(
             painter: PeiChartPainter(
+              total: _total,
               parts: _parts,
               datas: _animateDatas,
               legends: widget.legends,
@@ -127,11 +127,13 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
 }
 
 class PeiChartPainter extends CustomPainter {
+  final double total;
   final List<double> datas;
   final List<PiePart> parts;
   final List<String> legends;
 
   PeiChartPainter({
+    @required this.total,
     @required this.datas,
     @required this.legends,
     @required this.parts,
@@ -140,6 +142,7 @@ class PeiChartPainter extends CustomPainter {
   void drawParts(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
+    final double fontSize = 10.0;
     final double radius = math.min(sw, sh) / 2;
     final Offset center = Offset(sw / 2, sh / 2);
 
@@ -155,21 +158,27 @@ class PeiChartPainter extends CustomPainter {
 
     for (int i = 0; i < parts.length; i++) {
       final PiePart part = parts[i];
+      // 设置每部分的颜色
       paint.color = part.color;
+      // 使用 drawArc 方法画出弧形，参数依次是依照的矩形，起始弧度值，占据的弧度值，是否从中心点绘制，绘制属性
       canvas.drawArc(rect, part.startAngle, part.sweepAngle, true, paint);
 
-      final data = datas[i];
-      final radians = part.startAngle + part.sweepAngle / 2;
-      double x = math.cos(radians) * radius / 2 + sw / 2 - 22;
+      final double data = datas[i];
+      // 计算每部分占比
+      final String percent = (data / total * 100).toStringAsFixed(1);
+      final double radians = part.startAngle + part.sweepAngle / 2;
+      // 使用三角函数计算文字位置
+      double x = math.cos(radians) * radius / 2 + sw / 2 - fontSize * 3;
       double y = math.sin(radians) * radius / 2 + sh / 2;
-      final offset = Offset(x, y);
+      final Offset offset = Offset(x, y);
 
+      // 使用 TextPainter 绘制文字标识
       TextPainter(
         textAlign: TextAlign.start,
         text: TextSpan(
-          text: '$data%',
+          text: '$data $percent%',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: fontSize,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -213,7 +222,7 @@ class PeiChartPainter extends CustomPainter {
       final legend = legends[i];
       // 根据每部分的起始弧度加上自身弧度值的一半得到每部分的中间弧度值
       final radians = part.startAngle + part.sweepAngle / 2;
-      // 根据三角函数计算中出标识文字的 x 和 y 位置
+      // 根据三角函数计算中出标识文字的 x 和 y 位置，需要加上宽和高的一半适配 Canvas 的坐标
       double x = math.cos(radians) * (radius + 32) + sw / 2 - fontSize;
       double y = math.sin(radians) * (radius + 32) + sh / 2;
       final offset = Offset(x, y);
@@ -242,6 +251,7 @@ class PeiChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     drawCircle(canvas, size);
     drawLegends(canvas, size);
+    drawParts(canvas, size);
   }
 
   @override
