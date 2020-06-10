@@ -41,7 +41,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
     _controller = AnimationController(
       duration: Duration(milliseconds: 3000),
       vsync: this,
-    );
+    )..forward();
 
     List<double> datas = widget.datas;
     // 计算出数据总和
@@ -50,6 +50,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
     double startAngle = 0.0;
 
     for (int i = 0; i < datas.length; i++) {
+      _animateDatas.add(0.0);
       final data = datas[i];
       // 计算出每个数据所占的弧度值
       final angle = (data / _total) * -math.pi * 2;
@@ -86,7 +87,6 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
         setState(() {});
       });
     }
-    _controller.forward();
   }
 
   @override
@@ -98,10 +98,11 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
           width: 300,
           height: 300,
           child: CustomPaint(
+            // 将数据传给 PeiChartPainter
             painter: PeiChartPainter(
               total: _total,
               parts: _parts,
-              datas: _animateDatas,
+              datas: widget.datas,
               legends: widget.legends,
             ),
           ),
@@ -146,11 +147,13 @@ class PeiChartPainter extends CustomPainter {
     final double radius = math.min(sw, sh) / 2;
     final Offset center = Offset(sw / 2, sh / 2);
 
+    // 创建弧形依照的矩形
     final rect = Rect.fromCenter(
       center: center,
       width: radius * 2,
       height: radius * 2,
     );
+    // 设置绘制属性
     final paint = Paint()
       ..strokeWidth = 0.0
       ..isAntiAlias = true
@@ -218,8 +221,8 @@ class PeiChartPainter extends CustomPainter {
     final double fontSize = 12.0;
 
     for (int i = 0; i < datas.length; i++) {
-      final part = parts[i];
-      final legend = legends[i];
+      final PiePart part = parts[i];
+      final String legend = legends[i];
       // 根据每部分的起始弧度加上自身弧度值的一半得到每部分的中间弧度值
       final radians = part.startAngle + part.sweepAngle / 2;
       // 根据三角函数计算中出标识文字的 x 和 y 位置，需要加上宽和高的一半适配 Canvas 的坐标
