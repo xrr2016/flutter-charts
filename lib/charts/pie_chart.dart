@@ -37,11 +37,11 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    // 初始化动画控制器
     _controller = AnimationController(
       duration: Duration(milliseconds: 3000),
       vsync: this,
-    )..forward();
+    );
 
     List<double> datas = widget.datas;
     // 计算出数据总和
@@ -50,6 +50,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
     double startAngle = 0.0;
 
     for (int i = 0; i < datas.length; i++) {
+      // 填充动画数组
       _animateDatas.add(0.0);
       final data = datas[i];
       // 计算出每个数据所占的弧度值
@@ -73,19 +74,24 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
         curve: Curves.ease,
       );
 
+      // 创建弧形的补间动画
       final partTween = Tween<double>(begin: 0.0, end: peiPart.sweepAngle);
       Animation<double> animation = partTween.animate(curvedAnimation);
 
+      // 创建文字的补间动画
       final percentTween = Tween<double>(begin: 0.0, end: data);
       Animation<double> percentAnimation =
           percentTween.animate(curvedAnimation);
 
+      // 在动画启动后不断改变数据值
       _controller.addListener(() {
         _parts[i].sweepAngle = animation.value;
         _animateDatas[i] =
             double.parse(percentAnimation.value.toStringAsFixed(1));
         setState(() {});
       });
+      // 开始动画
+      _controller.forward();
     }
   }
 
@@ -102,7 +108,7 @@ class _PieChartState extends State<PieChart> with TickerProviderStateMixin {
             painter: PeiChartPainter(
               total: _total,
               parts: _parts,
-              datas: widget.datas,
+              datas: _animateDatas,
               legends: widget.legends,
             ),
           ),
