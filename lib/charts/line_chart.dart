@@ -1,8 +1,8 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 
 import 'package:custom_paint/colors.dart';
 import 'package:custom_paint/utils/create_animated_path.dart';
-import 'package:flutter/material.dart';
 
 class LineChart extends StatefulWidget {
   final List<double> datas;
@@ -27,14 +27,13 @@ class _LineChartState extends State<LineChart>
     super.initState();
     double begin = 0.0;
     double end = 4.0;
-
     List<double> datas = widget.datas;
     _controller = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 3000),
     );
 
-    final interval = 1 / datas.length;
+    final double interval = 1 / datas.length;
 
     for (int i = 0; i < datas.length; i++) {
       _animationPoints.add(begin);
@@ -105,7 +104,7 @@ class LineChartPainter extends CustomPainter {
     @required this.animation,
   }) : super(repaint: animation);
 
-  void drawLines(Canvas canvas, Size size) {
+  void _drawLines(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
     final gap = sw / datas.length;
@@ -130,7 +129,7 @@ class LineChartPainter extends CustomPainter {
     canvas.drawPath(createAnimatedPath(path, animation.value), paint);
   }
 
-  void drawPoints(Canvas canvas, Size size) {
+  void _drawPoints(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
     final gap = sw / datas.length;
@@ -145,7 +144,6 @@ class LineChartPainter extends CustomPainter {
       final dx = 0.0;
       final dy = sh - data;
       final offset = Offset(dx + gap * i + gap / 2, dy);
-
       canvas.drawCircle(offset, points[i], paint);
 
       final textOffset = Offset(dx + gap * i + 14, dy - 30);
@@ -166,14 +164,15 @@ class LineChartPainter extends CustomPainter {
         ..paint(canvas, textOffset);
 
       final xData = xAxis[i];
-      final xOffset = Offset(dx + gap * i + 14, sh);
+      final double labelFontSize = 12.0;
+      final xOffset = Offset(dx + gap * i + labelFontSize, sh + labelFontSize);
 
       TextPainter(
         textAlign: TextAlign.center,
         text: TextSpan(
           text: '$xData',
           style: TextStyle(
-            fontSize: 12,
+            fontSize: labelFontSize,
             color: Colors.black87,
           ),
         ),
@@ -187,10 +186,10 @@ class LineChartPainter extends CustomPainter {
     }
   }
 
-  void drawAxis(Canvas canvas, Size size) {
+  void _drawAxis(Canvas canvas, Size size) {
     final sw = size.width;
     final sh = size.height;
-    final gap = 10.0;
+    final gap = 0.0;
 
     final paint = Paint()
       ..color = Colors.black87
@@ -204,11 +203,56 @@ class LineChartPainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
+  void _drawLabels(Canvas canvas, Size size) {
+    final double labelFontSize = 12.0;
+    final double gap = 50.0;
+    final double sh = size.height;
+    final List<double> yAxisLabels = [];
+
+    Paint paint = Paint()
+      ..color = Colors.black87
+      ..strokeWidth = 2.0;
+
+    // 使用 50.0 为间隔绘制比传入数据多一个的标识
+    for (int i = 0; i <= datas.length; i++) {
+      yAxisLabels.add(gap * i);
+    }
+
+    yAxisLabels.asMap().forEach(
+      (index, label) {
+        // 标识的高度为画布高度减去标识的值
+        final double top = sh - label;
+        final rect = Rect.fromLTWH(0.0, top, 4, 1);
+        final Offset textOffset = Offset(
+          0 - labelFontSize * 3,
+          top - labelFontSize / 2,
+        );
+
+        // 绘制 Y 轴右边的线条
+        canvas.drawRect(rect, paint);
+
+        // 绘制文字需要用 `TextPainter`，最后调用 paint 方法绘制文字
+        TextPainter(
+          text: TextSpan(
+            text: label.toStringAsFixed(0),
+            style: TextStyle(fontSize: labelFontSize, color: Colors.black87),
+          ),
+          textAlign: TextAlign.right,
+          textDirection: TextDirection.ltr,
+          textWidthBasis: TextWidthBasis.longestLine,
+        )
+          ..layout(minWidth: 0, maxWidth: 24)
+          ..paint(canvas, textOffset);
+      },
+    );
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    drawAxis(canvas, size);
-    drawLines(canvas, size);
-    drawPoints(canvas, size);
+    _drawAxis(canvas, size);
+    _drawLabels(canvas, size);
+    _drawLines(canvas, size);
+    _drawPoints(canvas, size);
   }
 
   @override
