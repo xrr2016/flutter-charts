@@ -187,19 +187,22 @@ class LineChartPainter extends CustomPainter {
   }
 
   void _drawAxis(Canvas canvas, Size size) {
-    final sw = size.width;
-    final sh = size.height;
-    final gap = 0.0;
+    final double sw = size.width;
+    final double sh = size.height;
 
+    // 设置绘制属性
     final paint = Paint()
       ..color = Colors.black87
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
-    final path = Path()
-      ..moveTo(0.0 + gap, 0.0 + gap)
-      ..lineTo(0.0 + gap, sh - gap)
-      ..lineTo(sw - gap, sh - gap);
+      ..strokeWidth = 1.0
+      ..isAntiAlias = true;
 
+    // 创建一个 Path 对象，并规定它的路线
+    final Path path = Path()
+      ..moveTo(0.0, 0.0)
+      ..lineTo(0.0, sh)
+      ..lineTo(sw, sh);
+    // 绘制路径
     canvas.drawPath(path, paint);
   }
 

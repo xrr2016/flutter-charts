@@ -1,13 +1,33 @@
+import 'package:custom_paint/charts/bar_chart.dart';
 import 'package:flutter/material.dart';
-
-import '../charts/bar_chart.dart';
 
 class BarChartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BarChart(
-      data: [180.0, 98.0, 126.0, 64.0, 118.0],
-      xAxis: ['一月', '二月', '三月', '四月', '五月'],
+      max: 6000.0,
+      data: [
+        {
+          "label": "中国",
+          "value": 2800.0,
+        },
+        {
+          "label": "印度",
+          "value": 3000.0,
+        },
+        {
+          "label": "美国",
+          "value": 2200.0,
+        },
+        {
+          "label": "巴西",
+          "value": 3800.0,
+        },
+        {
+          "label": "法国",
+          "value": 5200.0,
+        },
+      ],
     );
   }
 }
