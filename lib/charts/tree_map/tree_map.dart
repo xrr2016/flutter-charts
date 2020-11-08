@@ -1,4 +1,12 @@
+import 'package:custom_paint/charts/tree_map/tree_node.dart';
 import 'package:flutter/material.dart';
+
+// 1. 将数据集转成近似平衡的二叉树
+// 2. 前序遍历二叉树
+// 3. 遍历过程中绘制每个字树
+
+import '../../utils/parse_arr_to_binary.dart';
+import 'build_bst.dart';
 
 class TreeMap extends StatefulWidget {
   @override
@@ -6,6 +14,18 @@ class TreeMap extends StatefulWidget {
 }
 
 class _TreeMapState extends State<TreeMap> {
+  @override
+  void initState() {
+    super.initState();
+
+    List<double> input = [2, 10, 4, 3, 7, 5, 9, 8, 1, 6];
+    List<double> output = parseArrToBinary(input);
+
+    TreeNode root = buildBST(output);
+
+    dfs(root);
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
@@ -86,8 +106,6 @@ class TreeMapPainter extends CustomPainter {
     renderRects.forEach((rect) {
       _drawRect(rect, canvas);
     });
-
-    print(renderRects);
   }
 
   @override

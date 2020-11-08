@@ -13,8 +13,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Tab> _tabs = <Tab>[
-    Tab(child: Text('条形图')),
     Tab(child: Text('矩形树图')),
+    Tab(child: Text('条形图')),
     Tab(child: Text('柱状图')),
     Tab(child: Text('饼图')),
     Tab(child: Text('折线图')),
@@ -22,8 +22,8 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<Widget> _tabViews = <Widget>[
-    BarChartPage(),
     TreeMapPage(),
+    BarChartPage(),
     ColumnChartPage(),
     PieChartPage(),
     LineChartPage(),
