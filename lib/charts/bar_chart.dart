@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
+
+import '../colors.dart';
 
 class BarChart extends StatefulWidget {
   final double max;

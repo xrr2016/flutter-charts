@@ -1,5 +1,5 @@
-import 'package:custom_paint/charts/line_chart.dart';
 import 'package:flutter/material.dart';
+import '../charts/line_chart.dart';
 
 class LineChartPage extends StatefulWidget {
   @override

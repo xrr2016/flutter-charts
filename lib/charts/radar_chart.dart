@@ -1,7 +1,8 @@
 import 'dart:math';
-import 'package:custom_paint/colors.dart';
-import 'package:custom_paint/utils/create_animated_path.dart';
 import 'package:flutter/material.dart';
+
+import '../colors.dart';
+import '../utils/create_animated_path.dart';
 
 class RadarChart extends StatefulWidget {
   final List<double> scores;

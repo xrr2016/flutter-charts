@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:custom_paint/charts/tree_map/tree_map.dart';
+import '../charts/tree_map/tree_map.dart';
 import 'package:flutter/material.dart';
 
 class TreeMapPage extends StatefulWidget {

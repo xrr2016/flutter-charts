@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-
-import 'package:custom_paint/colors.dart';
-import 'package:custom_paint/utils/create_animated_path.dart';
+import '../colors.dart';
+import '../utils/create_animated_path.dart';
 
 class LineChart extends StatefulWidget {
   final List<double> datas;

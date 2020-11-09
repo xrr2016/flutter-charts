@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
+
+import '../colors.dart';
 
 class PiePart {
   double sweepAngle;

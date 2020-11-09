@@ -1,9 +1,9 @@
-import 'package:custom_paint/pages/bar_chart_page.dart';
-import 'package:custom_paint/pages/column_chart_page.dart';
-import 'package:custom_paint/pages/line_chart_page.dart';
-import 'package:custom_paint/pages/pie_chart_page.dart';
-import 'package:custom_paint/pages/radar_chart_page.dart';
-import 'package:custom_paint/pages/tree_map_page.dart';
+import './pages/bar_chart_page.dart';
+import './pages/column_chart_page.dart';
+import './pages/line_chart_page.dart';
+import './pages/pie_chart_page.dart';
+import './pages/radar_chart_page.dart';
+import './pages/tree_map_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {

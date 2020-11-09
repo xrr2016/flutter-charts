@@ -1,4 +1,4 @@
-import 'package:custom_paint/charts/bar_chart.dart';
+import '../charts/bar_chart.dart';
 import 'package:flutter/material.dart';
 
 class BarChartPage extends StatelessWidget {

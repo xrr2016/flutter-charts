@@ -1,5 +1,6 @@
-import 'package:custom_paint/colors.dart';
 import 'package:flutter/material.dart';
+
+import '../colors.dart';
 
 class ColumnChart extends StatefulWidget {
   final List<double> data;

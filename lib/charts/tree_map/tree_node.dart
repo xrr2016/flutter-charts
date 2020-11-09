@@ -5,3 +5,13 @@ class TreeNode {
 
   TreeNode(this.value);
 }
+
+void dfs(TreeNode root) {
+  if (root == null) {
+    return;
+  }
+
+  print(root.value);
+  dfs(root.left);
+  dfs(root.right);
+}
