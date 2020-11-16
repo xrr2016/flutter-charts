@@ -1,10 +1,12 @@
+import 'package:flutter/material.dart';
+
 import './pages/bar_chart_page.dart';
 import './pages/column_chart_page.dart';
 import './pages/line_chart_page.dart';
 import './pages/pie_chart_page.dart';
 import './pages/radar_chart_page.dart';
 import './pages/tree_map_page.dart';
-import 'package:flutter/material.dart';
+import './pages/donut_chart_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Tab> _tabs = <Tab>[
+    Tab(child: Text('环形图')),
     Tab(child: Text('矩形树图')),
     Tab(child: Text('条形图')),
     Tab(child: Text('柱状图')),
@@ -22,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<Widget> _tabViews = <Widget>[
+    DonutChartPage(),
     TreeMapPage(),
     BarChartPage(),
     ColumnChartPage(),
