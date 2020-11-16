@@ -4,10 +4,6 @@ import 'package:flutter/material.dart';
 import '../../colors.dart';
 import './tree_node.dart';
 
-Paint paint = Paint()
-  ..style = PaintingStyle.stroke
-  ..strokeWidth = 2.0;
-
 TextPainter textPainter = TextPainter(
   text: TextSpan(),
   textAlign: TextAlign.center,
@@ -22,7 +18,7 @@ void _drawText(double value, Canvas canvas, Offset offset) {
     text: value.toString(),
     style: TextStyle(
       fontSize: 24.0,
-      color: colors[Random().nextInt(colors.length)],
+      color: Colors.white,
     ),
   );
 
@@ -35,48 +31,11 @@ void _drawText(double value, Canvas canvas, Offset offset) {
     ..paint(canvas, offset);
 }
 
-void _drawLeftNode(
-    TreeNode node, Rect rootRect, TreeNode rootNode, Canvas canvas) {
-  if (node == null) {
-    return;
-  }
-
-  if (node.left == null && node.right == null) {
-    return;
-  }
-
-  double left;
-  double top;
-  double width;
-  double height;
-
-  left = rootRect.left;
-  width = rootRect.width;
-  top = rootRect.top;
-  height = (node.left.value / rootNode.value) * rootRect.height;
-
-  Rect rectLeft = Rect.fromLTWH(left, top, width, height);
-  canvas.drawRect(rectLeft, paint);
-
-  _drawText(
-    node.left.value,
-    canvas,
-    Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
-  );
-}
-
-void _drawRihgtNode(TreeNode node) {
-  if (node == null) {
-    return;
-  }
-}
-
-int level = 0;
-
 void drawTreeRects(
   TreeNode node,
   Rect rootRectLeft,
   TreeNode rootNodeLeft,
+  int level,
   Canvas canvas,
 ) {
   if (node == null) {
@@ -85,6 +44,17 @@ void drawTreeRects(
   if (node.left == null && node.right == null) {
     return;
   }
+
+  Paint paint = Paint()
+    ..style = PaintingStyle.fill
+    ..color = colors[Random().nextInt(colors.length)]
+    ..isAntiAlias = true;
+
+  Paint linePaint = Paint()
+    ..style = PaintingStyle.stroke
+    ..color = Colors.white
+    ..strokeWidth = 2.0
+    ..isAntiAlias = true;
 
   Rect rectLeft;
   Rect rectRight;
@@ -95,15 +65,16 @@ void drawTreeRects(
     double width;
     double height;
 
+    top = rootRectLeft.top;
     left = rootRectLeft.left;
     width = rootRectLeft.width;
-    top = rootRectLeft.top;
     height = (node.left.value / rootNodeLeft.value) * rootRectLeft.height;
-
     rectLeft = Rect.fromLTWH(left, top, width, height);
-    canvas.drawRect(rectLeft, paint);
 
     if (node.left.left == null && node.left.right == null) {
+      canvas.drawRect(rectLeft, paint);
+      canvas.drawRect(rectLeft, linePaint);
+
       _drawText(
         node.left.value,
         canvas,
@@ -115,11 +86,12 @@ void drawTreeRects(
     top = rootRectLeft.top + height;
     width = rootRectLeft.width;
     height = (node.right.value / rootNodeLeft.value) * rootRectLeft.height;
-
     rectRight = Rect.fromLTWH(left, top, width, height);
-    canvas.drawRect(rectRight, paint);
 
     if (node.right.left == null && node.right.right == null) {
+      canvas.drawRect(rectRight, paint);
+      canvas.drawRect(rectRight, linePaint);
+
       _drawText(
         node.right.value,
         canvas,
@@ -136,9 +108,11 @@ void drawTreeRects(
     left = rootRectLeft.left;
     width = (node.left.value / rootNodeLeft.value) * rootRectLeft.width;
     rectLeft = Rect.fromLTWH(left, top, width, height);
-    canvas.drawRect(rectLeft, paint);
 
     if (node.left.left == null && node.left.right == null) {
+      canvas.drawRect(rectLeft, paint);
+      canvas.drawRect(rectLeft, linePaint);
+
       _drawText(
         node.left.value,
         canvas,
@@ -151,7 +125,17 @@ void drawTreeRects(
     left = rootRectLeft.left + width;
     width = (node.right.value / rootNodeLeft.value) * rootRectLeft.width;
     rectRight = Rect.fromLTWH(left, top, width, height);
-    canvas.drawRect(rectRight, paint);
+
+    if (node.left.left == null && node.left.right == null) {
+      canvas.drawRect(rectRight, paint);
+      canvas.drawRect(rectRight, linePaint);
+
+      _drawText(
+        node.right.value,
+        canvas,
+        Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
+      );
+    }
   }
 
   level++;
@@ -160,6 +144,7 @@ void drawTreeRects(
     node.left,
     rectLeft,
     node.left,
+    level,
     canvas,
   );
 
@@ -167,6 +152,7 @@ void drawTreeRects(
     node.right,
     rectRight,
     node.right,
+    level,
     canvas,
   );
 }

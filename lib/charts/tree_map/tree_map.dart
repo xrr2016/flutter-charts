@@ -8,36 +8,41 @@ import './draw_tree_rects.dart';
 // 2. 前序遍历二叉树
 // 3. 遍历过程中绘制每个字树
 
-class TreeMap extends StatefulWidget {
-  @override
-  _TreeMapState createState() => _TreeMapState();
-}
+class TreeMap extends StatelessWidget {
+  final List<double> datas;
 
-class _TreeMapState extends State<TreeMap> {
+  const TreeMap({@required this.datas});
+
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: TreeMapPainter(),
-      child: Container(
-        width: 500,
-        height: 500,
-      ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return CustomPaint(
+          painter: TreeMapPainter(
+            datas: datas,
+          ),
+          size: constraints.biggest,
+        );
+      },
     );
   }
 }
 
 class TreeMapPainter extends CustomPainter {
+  final List<double> datas;
+
+  TreeMapPainter({@required this.datas});
+
   @override
   void paint(Canvas canvas, Size size) {
-    List<double> input = [2, 10, 4, 3, 7, 5, 9, 8, 1, 6];
     Paint paint = Paint()
       ..color = Colors.black12
       ..style = PaintingStyle.fill;
 
     Rect rootRect = Rect.fromLTWH(0, 0, size.width, size.height);
-    TreeNode rootNode = parseArrayToBST(input);
+    TreeNode rootNode = parseArrayToBST(datas);
     canvas.drawRect(rootRect, paint);
-    drawTreeRects(rootNode, rootRect, rootNode, canvas);
+    drawTreeRects(rootNode, rootRect, rootNode, 0, canvas);
   }
 
   @override
