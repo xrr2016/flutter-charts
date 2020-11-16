@@ -37,7 +37,7 @@ class TreeMapPainter extends CustomPainter {
     Rect rootRect = Rect.fromLTWH(0, 0, size.width, size.height);
     TreeNode rootNode = parseArrayToBST(input);
     canvas.drawRect(rootRect, paint);
-    drawTreeLeftRects(rootNode, rootRect, rootNode, 0, canvas);
+    drawTreeRects(rootNode, rootRect, rootNode, canvas);
   }
 
   @override

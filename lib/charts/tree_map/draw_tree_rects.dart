@@ -35,14 +35,48 @@ void _drawText(double value, Canvas canvas, Offset offset) {
     ..paint(canvas, offset);
 }
 
-void _drawEvenLevel() {}
-void _drawOddLevel() {}
+void _drawLeftNode(
+    TreeNode node, Rect rootRect, TreeNode rootNode, Canvas canvas) {
+  if (node == null) {
+    return;
+  }
 
-void drawTreeLeftRects(
+  if (node.left == null && node.right == null) {
+    return;
+  }
+
+  double left;
+  double top;
+  double width;
+  double height;
+
+  left = rootRect.left;
+  width = rootRect.width;
+  top = rootRect.top;
+  height = (node.left.value / rootNode.value) * rootRect.height;
+
+  Rect rectLeft = Rect.fromLTWH(left, top, width, height);
+  canvas.drawRect(rectLeft, paint);
+
+  _drawText(
+    node.left.value,
+    canvas,
+    Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
+  );
+}
+
+void _drawRihgtNode(TreeNode node) {
+  if (node == null) {
+    return;
+  }
+}
+
+int level = 0;
+
+void drawTreeRects(
   TreeNode node,
   Rect rootRectLeft,
   TreeNode rootNodeLeft,
-  int levelLeft,
   Canvas canvas,
 ) {
   if (node == null) {
@@ -55,14 +89,7 @@ void drawTreeLeftRects(
   Rect rectLeft;
   Rect rectRight;
 
-  if (levelLeft.isEven) {
-    print({
-      'even': true,
-      'node': node.value,
-      'node.left': node.left.value,
-      'node.right': node.right.value,
-    });
-
+  if (level.isEven) {
     double left;
     double top;
     double width;
@@ -76,11 +103,14 @@ void drawTreeLeftRects(
     rectLeft = Rect.fromLTWH(left, top, width, height);
     canvas.drawRect(rectLeft, paint);
 
-    _drawText(
-      node.left.value,
-      canvas,
-      Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
-    );
+    if (node.left.left == null && node.left.right == null) {
+      _drawText(
+        node.left.value,
+        canvas,
+        Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
+      );
+    }
+
     left = rootRectLeft.left;
     top = rootRectLeft.top + height;
     width = rootRectLeft.width;
@@ -88,19 +118,15 @@ void drawTreeLeftRects(
 
     rectRight = Rect.fromLTWH(left, top, width, height);
     canvas.drawRect(rectRight, paint);
-    _drawText(
-      node.right.value,
-      canvas,
-      Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
-    );
-  } else {
-    print({
-      'odd': true,
-      'node': node.value,
-      'node.left': node.left.value,
-      'node.right': node.right.value,
-    });
 
+    if (node.right.left == null && node.right.right == null) {
+      _drawText(
+        node.right.value,
+        canvas,
+        Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
+      );
+    }
+  } else {
     double left;
     double width;
     double top = rootRectLeft.top;
@@ -111,11 +137,14 @@ void drawTreeLeftRects(
     width = (node.left.value / rootNodeLeft.value) * rootRectLeft.width;
     rectLeft = Rect.fromLTWH(left, top, width, height);
     canvas.drawRect(rectLeft, paint);
-    _drawText(
-      node.left.value,
-      canvas,
-      Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
-    );
+
+    if (node.left.left == null && node.left.right == null) {
+      _drawText(
+        node.left.value,
+        canvas,
+        Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
+      );
+    }
 
     top = rootRectLeft.top;
     height = rootRectLeft.height;
@@ -123,30 +152,21 @@ void drawTreeLeftRects(
     width = (node.right.value / rootNodeLeft.value) * rootRectLeft.width;
     rectRight = Rect.fromLTWH(left, top, width, height);
     canvas.drawRect(rectRight, paint);
-
-    // if (node.left == null && node.right == null) {
-    //   _drawText(
-    //     node.right.value,
-    //     canvas,
-    //     Offset(left + width / 2 - 12.0, top + height / 2 - 12.0),
-    //   );
-    // }
   }
 
-  levelLeft++;
-  drawTreeLeftRects(
+  level++;
+
+  drawTreeRects(
     node.left,
     rectLeft,
     node.left,
-    levelLeft,
     canvas,
   );
 
-  drawTreeLeftRects(
+  drawTreeRects(
     node.right,
     rectRight,
     node.right,
-    levelLeft,
     canvas,
   );
 }

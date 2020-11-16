@@ -15,8 +15,6 @@ TreeNode parseArrayToBST(List<double> array) {
     sums[i + 1] = sum;
   }
 
-  // print({'sums: ': sums});
-
   final TreeNode root = TreeNode(sums.last);
 
   void partition(int start, int end, TreeNode node) {
@@ -52,11 +50,6 @@ TreeNode parseArrayToBST(List<double> array) {
 
     node.left = nodeLeft;
     node.right = nodeRight;
-
-    // print({
-    //   'nodeLeft: ': nodeLeft.value,
-    //   'nodeRight: ': nodeRight.value,
-    // });
 
     partition(start, left, nodeLeft);
     partition(left, end, nodeRight);
