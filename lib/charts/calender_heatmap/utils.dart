@@ -49,3 +49,11 @@ yearLength(int year) {
   }
   return yearLength;
 }
+
+lastDayOfMonth(int year, int month) {
+  return DateTime(year, month + 1, 0);
+}
+
+firstDayOfMonth(int year, int month) {
+  return DateTime(year, month, 1).day;
+}

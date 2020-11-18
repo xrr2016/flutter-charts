@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class CSCalendarBlock extends StatelessWidget {
+class CalendarBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
-      painter: CSCalendarBlockPainter(),
+      painter: CalendarBlockPainter(),
     );
   }
 }
 
-class CSCalendarBlockPainter extends CustomPainter {
+class CalendarBlockPainter extends CustomPainter {
   final double blockWidth = 25.0;
   final double blockHeight = 25.0;
   final double blockRadius = 5.0;
@@ -50,8 +50,8 @@ class CSCalendarBlockPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CSCalendarBlockPainter oldDelegate) => true;
+  bool shouldRepaint(CalendarBlockPainter oldDelegate) => true;
 
   @override
-  bool shouldRebuildSemantics(CSCalendarBlockPainter oldDelegate) => false;
+  bool shouldRebuildSemantics(CalendarBlockPainter oldDelegate) => false;
 }

@@ -8,6 +8,7 @@ import './pages/radar_chart_page.dart';
 import './pages/tree_map_page.dart';
 import './pages/donut_chart_page.dart';
 import './pages/area_chart_page.dart';
+import './pages/calender_heatmap_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,6 +17,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Tab> _tabs = <Tab>[
+    Tab(child: Text('日历热力图')),
     Tab(child: Text('面积图')),
     Tab(child: Text('环形图')),
     Tab(child: Text('矩形树图')),
@@ -27,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<Widget> _tabViews = <Widget>[
+    CalenderHeatMapPage(),
     AreaChartPage(),
     DonutChartPage(),
     TreeMapPage(),
