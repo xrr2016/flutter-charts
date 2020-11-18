@@ -1,11 +1,42 @@
 import 'package:flutter/material.dart';
-import '../../utils/draw_grid.dart';
-import 'utils.dart';
+import 'package:flutter_charts/utils/draw_grid.dart';
+
+import './utils.dart';
+
+enum HEAT_LEVEL {
+  NONE,
+  LOW,
+  NORMAL,
+  HIGH,
+}
+
+extension HEAT_LEVEL_VALUE on HEAT_LEVEL {
+  double value() {
+    switch (this) {
+      case HEAT_LEVEL.NONE:
+        return 0.0;
+      case HEAT_LEVEL.LOW:
+        return 0.4;
+      case HEAT_LEVEL.NORMAL:
+        return 0.6;
+      case HEAT_LEVEL.HIGH:
+        return 1.0;
+      default:
+        return 0.0;
+    }
+  }
+}
 
 class CalenderHeatMap extends StatelessWidget {
-  final List<double> datas;
+  static final DateTime now = DateTime.now();
 
-  const CalenderHeatMap({Key key, this.datas}) : super(key: key);
+  final List<double> datas;
+  final int totalDays;
+
+  const CalenderHeatMap({
+    @required this.datas,
+    this.totalDays = 31,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +74,40 @@ class CalenderHeatMapPainter extends CustomPainter {
     canvas.drawRRect(rrect, paint);
   }
 
+  void _drawWeekDayTexts(Canvas canvas, Size size) {
+    canvas.save();
+    canvas.translate(0, size.height / 4);
+    Offset start = Offset(30.0, 0.0);
+
+    weekDayTextEn.asMap().forEach((index, text) {
+      TextPainter(
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      )
+        ..text = TextSpan(
+          text: text,
+          style: TextStyle(
+            fontSize: 24.0,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        )
+        ..layout(
+          minWidth: 0.0,
+          maxWidth: 100.0,
+        )
+        ..paint(canvas, start);
+
+      start += Offset(0, gap + blockHeight);
+    });
+    canvas.restore();
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     // drawGrid(canvas, size);
-    Offset start = Offset(10.0, 0.0);
+    _drawWeekDayTexts(canvas, size);
+    Offset start = Offset(100.0, 0.0);
     final Paint paint = Paint()
       ..color = Colors.black12
       ..isAntiAlias = true
@@ -72,7 +133,7 @@ class CalenderHeatMapPainter extends CustomPainter {
         move = Offset(gap + blockWidth, -start.dy);
         start += move;
       } else {
-        Offset move = Offset(0, gap + blockHeight);
+        move = Offset(0, gap + blockHeight);
         start += move;
       }
       if (i >= firstDay.weekday - 1) {
