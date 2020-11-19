@@ -1,41 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_charts/utils/draw_grid.dart';
+import 'dart:math';
 
+import 'package:flutter/material.dart';
+
+import '../../utils/draw_grid.dart';
 import './utils.dart';
 
-enum HEAT_LEVEL {
-  NONE,
-  LOW,
-  NORMAL,
-  HIGH,
-}
-
-extension HEAT_LEVEL_VALUE on HEAT_LEVEL {
-  double value() {
-    switch (this) {
-      case HEAT_LEVEL.NONE:
-        return 0.0;
-      case HEAT_LEVEL.LOW:
-        return 0.4;
-      case HEAT_LEVEL.NORMAL:
-        return 0.6;
-      case HEAT_LEVEL.HIGH:
-        return 1.0;
-      default:
-        return 0.0;
-    }
-  }
-}
-
 class CalenderHeatMap extends StatelessWidget {
-  static final DateTime now = DateTime.now();
-
   final List<double> datas;
-  final int totalDays;
 
   const CalenderHeatMap({
     @required this.datas,
-    this.totalDays = 31,
   });
 
   @override
@@ -43,7 +17,7 @@ class CalenderHeatMap extends StatelessWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         return CustomPaint(
-          painter: CalenderHeatMapPainter(),
+          painter: CalenderHeatMapPainter(datas: datas),
           size: constraints.biggest,
         );
       },
@@ -52,22 +26,32 @@ class CalenderHeatMap extends StatelessWidget {
 }
 
 class CalenderHeatMapPainter extends CustomPainter {
+  final List<double> datas;
+
+  CalenderHeatMapPainter({
+    @required this.datas,
+  });
+
+  final double gap = 5.0;
   final double blockWidth = 25.0;
   final double blockHeight = 25.0;
   final double blockRadius = 5.0;
-  final double gap = 5.0;
 
   Color _generateBlockColor({double opacity = 1}) {
+    if (opacity == 0) {
+      return Colors.black12;
+    }
+
     return Color.fromRGBO(45, 181, 93, opacity);
   }
 
-  void _drawBlock(Canvas canvas, double left, double top) {
+  void _drawBlock(Canvas canvas, Offset offset, Color color) {
     final Paint paint = Paint()
-      ..color = Colors.black12
+      ..color = color
       ..isAntiAlias = true
       ..style = PaintingStyle.fill;
-
-    final Rect rect = Rect.fromLTWH(left, top, blockWidth, blockHeight);
+    final Rect rect =
+        Rect.fromLTWH(offset.dx, offset.dy, blockWidth, blockHeight);
     final Radius radius = Radius.circular(blockRadius);
     final rrect = RRect.fromRectAndRadius(rect, radius);
 
@@ -105,44 +89,46 @@ class CalenderHeatMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // drawGrid(canvas, size);
+    drawGrid(canvas, size);
     _drawWeekDayTexts(canvas, size);
-    Offset start = Offset(100.0, 0.0);
-    final Paint paint = Paint()
-      ..color = Colors.black12
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill;
-
-    DateTime firstDay = DateTime(2020, 7, 1);
-    // int days = daysInMonth(2020, 11);
-    int wholeMonthDays = 7 * 5;
 
     canvas.save();
     canvas.translate(0, size.height / 4);
+    Offset start = Offset(100.0, 0.0);
 
-    for (int i = 1; i <= wholeMonthDays; i++) {
-      final Rect rect =
-          Rect.fromLTWH(start.dx, start.dy, blockWidth, blockHeight);
-      final Radius radius = Radius.circular(blockRadius);
-      final rrect = RRect.fromRectAndRadius(rect, radius);
-
-      canvas.drawRRect(rrect, paint);
-
+    for (int i = 0; i < datas.length; i++) {
       Offset move;
-      if (i % 7 == 0) {
-        move = Offset(gap + blockWidth, -start.dy);
-        start += move;
-      } else {
-        move = Offset(0, gap + blockHeight);
-        start += move;
-      }
-      if (i >= firstDay.weekday - 1) {
-        paint.color = Color.fromRGBO(45, 181, 93, 1);
-      } else {
-        paint.color = Colors.black12;
-      }
-    }
 
+      if (i == 0) {
+        move = Offset.zero;
+      } else {
+        if (i % 7 == 0) {
+          move = Offset(gap + blockWidth, -start.dy);
+        } else {
+          move = Offset(0, gap + blockHeight);
+        }
+      }
+      start += move;
+
+      final double val = datas[i];
+      final double maxVal = datas.reduce(max);
+      final percent = val / maxVal;
+      double opacity;
+
+      if (percent > .8) {
+        opacity = 1;
+      } else if (percent > .6) {
+        opacity = 0.8;
+      } else if (percent > .4) {
+        opacity = 0.6;
+      } else if (percent < .2) {
+        opacity = 0.4;
+      } else {
+        opacity = 0.0;
+      }
+
+      _drawBlock(canvas, start, _generateBlockColor(opacity: opacity));
+    }
     canvas.restore();
   }
 

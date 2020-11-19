@@ -67,6 +67,7 @@ List<String> weekDayTextEn = [
   'Sat',
   'Sun',
 ];
+
 List<String> weekDayTextCh = [
   '星期一',
   '星期二',
@@ -75,4 +76,34 @@ List<String> weekDayTextCh = [
   '星期五',
   '星期六',
   '星期日',
+];
+
+List<String> monthTextEn = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
+List<String> monthTextCn = [
+  '一月',
+  '二月',
+  '三月',
+  '四月',
+  '五月',
+  '六月',
+  '七月',
+  '八月',
+  '九月',
+  '十月',
+  '十一月',
+  '十二月',
 ];

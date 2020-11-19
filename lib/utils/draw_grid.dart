@@ -12,7 +12,7 @@ void drawGrid(Canvas canvas, Size size) {
 
   for (double i = 0; i < size.height; i += step) {
     if (i % 90 == 0) {
-      paint.color = Colors.black54;
+      paint.color = Colors.black26;
       paint.strokeWidth = 1.0;
     } else {
       paint.color = Colors.black12;
@@ -29,7 +29,7 @@ void drawGrid(Canvas canvas, Size size) {
 
   for (double i = 0; i < size.width; i += step) {
     if (i % 90 == 0) {
-      paint.color = Colors.black54;
+      paint.color = Colors.black26;
       paint.strokeWidth = 1.0;
     } else {
       paint.color = Colors.black12;
