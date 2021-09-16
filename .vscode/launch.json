@@ -8,6 +8,11 @@
       "name": "Dev",
       "request": "launch",
       "type": "dart"
-    }
+    },
+    {
+      "name": "WEB",
+      "request": "launch",
+      "type": "dart"
+    },
   ]
 }

@@ -11,6 +11,6 @@ class TreeMapPage extends StatefulWidget {
 class _TreeMapPageState extends State<TreeMapPage> {
   @override
   Widget build(BuildContext context) {
-    return TreeMap(datas: [2, 10, 4, 3, 7, 5, 9, 8, 1, 6]);
+    return TreeMap(datas: [2, 10, 4, 3, 7, 5, 9, 8, 1, 6, 9]);
   }
 }

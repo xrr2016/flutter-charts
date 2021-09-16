@@ -17,10 +17,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Tab> _tabs = <Tab>[
+    Tab(child: Text('矩形树图')),
     Tab(child: Text('日历热力图')),
     Tab(child: Text('面积图')),
     Tab(child: Text('环形图')),
-    Tab(child: Text('矩形树图')),
     Tab(child: Text('条形图')),
     Tab(child: Text('柱状图')),
     Tab(child: Text('饼图')),
@@ -29,10 +29,10 @@ class _HomePageState extends State<HomePage> {
   ];
 
   List<Widget> _tabViews = <Widget>[
+    TreeMapPage(),
     CalenderHeatMapPage(),
     AreaChartPage(),
     DonutChartPage(),
-    TreeMapPage(),
     BarChartPage(),
     ColumnChartPage(),
     PieChartPage(),

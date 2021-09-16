@@ -31,13 +31,20 @@ void _drawText(double value, Canvas canvas, Offset offset) {
     ..paint(canvas, offset);
 }
 
-void drawTreeRects(
-  TreeNode node,
-  Rect rootRectLeft,
-  TreeNode rootNodeLeft,
-  int level,
-  Canvas canvas,
-) {
+Paint linePaint = Paint()
+  ..style = PaintingStyle.stroke
+  ..color = Colors.white
+  ..strokeWidth = 2.0
+  ..isAntiAlias = true;
+
+Paint paint = Paint()
+  ..style = PaintingStyle.fill
+  ..color = colors[0]
+  ..isAntiAlias = true;
+
+void drawTreeRects(TreeNode node, Rect rootRectLeft, TreeNode rootNodeLeft,
+    int level, Canvas canvas,
+    {double scale = 1.0, Color color = Colors.blue}) {
   if (node == null) {
     return;
   }
@@ -45,23 +52,15 @@ void drawTreeRects(
     return;
   }
 
-  print({
-    'level': level,
-    'node: ': node.value,
-    'node.left: ': node.left.value,
-    'node.right: ': node.right.value,
-  });
+  // print({
+  //   'level': level,
+  //   'node: ': node.value,
+  //   'node.left: ': node.left.value,
+  //   'node.right: ': node.right.value,
+  // });
 
-  Paint paint = Paint()
-    ..style = PaintingStyle.fill
-    ..color = colors[Random().nextInt(colors.length)]
-    ..isAntiAlias = true;
-
-  Paint linePaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..color = Colors.white
-    ..strokeWidth = 2.0
-    ..isAntiAlias = true;
+  // paint.color = color;
+  paint.color = colors[Random().nextInt(colors.length)];
 
   Rect rectLeft;
   Rect rectRight;
@@ -76,10 +75,20 @@ void drawTreeRects(
     left = rootRectLeft.left;
     width = rootRectLeft.width;
     height = (node.left.value / rootNodeLeft.value) * rootRectLeft.height;
-    rectLeft = Rect.fromLTWH(left, top, width, height);
 
+    double scaleWidth = width * scale;
+    double scaleHeight = height * scale;
+
+    Offset rectLeftCenter = Offset(width / 2 + left, height / 2 + top);
+    rectLeft = Rect.fromCenter(
+      center: rectLeftCenter,
+      width: scaleWidth,
+      height: scaleHeight,
+    );
     canvas.drawRect(rectLeft, paint);
-    canvas.drawRect(rectLeft, linePaint);
+
+    Rect rectLineLeft = Rect.fromLTWH(left, top, width, height);
+    canvas.drawRect(rectLineLeft, linePaint);
 
     _drawText(
       node.left.value,
@@ -91,10 +100,20 @@ void drawTreeRects(
     top = rootRectLeft.top + height;
     width = rootRectLeft.width;
     height = (node.right.value / rootNodeLeft.value) * rootRectLeft.height;
-    rectRight = Rect.fromLTWH(left, top, width, height);
 
+    scaleWidth = width * scale;
+    scaleHeight = height * scale;
+
+    Offset rectRightCenter = Offset(width / 2 + left, height / 2 + top);
+    rectRight = Rect.fromCenter(
+      center: rectRightCenter,
+      width: scaleWidth,
+      height: scaleHeight,
+    );
     canvas.drawRect(rectRight, paint);
-    canvas.drawRect(rectRight, linePaint);
+
+    Rect rectLineRight = Rect.fromLTWH(left, top, width, height);
+    canvas.drawRect(rectLineRight, linePaint);
 
     _drawText(
       node.right.value,
@@ -110,10 +129,20 @@ void drawTreeRects(
     // left node
     left = rootRectLeft.left;
     width = (node.left.value / rootNodeLeft.value) * rootRectLeft.width;
-    rectLeft = Rect.fromLTWH(left, top, width, height);
 
+    double scaleWidth = width * scale;
+    double scaleHeight = height * scale;
+
+    Offset rectLeftCenter = Offset(width / 2 + left, height / 2 + top);
+    rectLeft = Rect.fromCenter(
+      center: rectLeftCenter,
+      width: scaleWidth,
+      height: scaleHeight,
+    );
     canvas.drawRect(rectLeft, paint);
-    canvas.drawRect(rectLeft, linePaint);
+
+    Rect rectLineLeft = Rect.fromLTWH(left, top, width, height);
+    canvas.drawRect(rectLineLeft, linePaint);
 
     _drawText(
       node.left.value,
@@ -125,10 +154,21 @@ void drawTreeRects(
     height = rootRectLeft.height;
     left = rootRectLeft.left + width;
     width = (node.right.value / rootNodeLeft.value) * rootRectLeft.width;
-    rectRight = Rect.fromLTWH(left, top, width, height);
 
+    scaleWidth = width * scale;
+    scaleHeight = height * scale;
+
+    Offset rectRightCenter = Offset(width / 2 + left, height / 2 + top);
+    rectRight = Rect.fromCenter(
+      center: rectRightCenter,
+      width: scaleWidth,
+      height: scaleHeight,
+    );
     canvas.drawRect(rectRight, paint);
-    canvas.drawRect(rectRight, linePaint);
+
+    Rect rectLineRight = Rect.fromLTWH(left, top, width, height);
+    canvas.drawRect(rectLineRight, linePaint);
+
     _drawText(
       node.right.value,
       canvas,
@@ -138,19 +178,10 @@ void drawTreeRects(
 
   level++;
 
-  drawTreeRects(
-    node.left,
-    rectLeft,
-    node.left,
-    level,
-    canvas,
-  );
-
-  drawTreeRects(
-    node.right,
-    rectRight,
-    node.right,
-    level,
-    canvas,
-  );
+  // 递归绘制左节点
+  drawTreeRects(node.left, rectLeft, node.left, level, canvas,
+      scale: scale, color: color);
+  // 递归绘制右节点
+  drawTreeRects(node.right, rectRight, node.right, level, canvas,
+      scale: scale, color: color);
 }
